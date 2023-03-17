@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Taxi dashboard</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap Icons-->
+    <<link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>" />
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic"
+        rel="stylesheet" type="text/css" />
+    <!-- SimpleLightbox plugin CSS-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+<style>
+
+</style>
+
+<body>
+    <div id="map"></div>
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="#page-top">歡迎回來</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto my-2 my-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#about">開始行程</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">會員中心</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#portfolio">過去行程</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">服務中心</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Masthead-->
+    <!--使用 Bootstrap 設計登入表單-->
+    <div class="panel panel-primary">
+        <div class="panel-heading">登入頁面範例</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label>司機ID</label>
+                <input type="text" class="form-control" v-model="form.UserID">
+                <label class="text-primary">首字請大寫，請勿輸入空格或標點符號。</label>
+            </div>
+            <div class="form-group">
+                <label>LINE-ID</label>
+                <input class="form-control" type="text" placeholder="自動填入" aria-label="readonly input example" readonly>
+            </div>
+            <div class="form-group">
+                <label>手機號碼</label>
+                <input type="password" class="form-control" v-model="form.UserPwd">
+                <label class="text-primary">請勿輸入空格或標點符號。</label>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="checkbox">
+                <label>
+                    <input class="form-check-input" type="checkbox" value="true" id="chkKeepLogin" v-model="form.KeepLogin">
+                    保持登入
+                </label>
+            </div>
+            <button type="button" class="btn btn-primary" v-on:click="DoLogin()">登入</button>
+            @Html.ActionLink("更改認證手機號碼", "ForgetPwd", "Member")
+            
+        </div>
+    <!-- Footer-->
+    <footer class="bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            <div class="small text-center text-muted">
+                <a href="#" data-bs-toggle="tooltip" data-bs-title="Default tooltip">使用條款</a>及
+                <a href="#" data-bs-toggle="tooltip" data-bs-title="Default tooltip">隱私權聲明</a>
+            </div>
+        </div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SimpleLightbox plugin JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8Z5fuY0qEAG_fA3sHiuk8vRet4KTxUsw&callback=initMap"></script>
+</body>
+
+</html>
