@@ -56,8 +56,8 @@ function headingCorrection(heading) {
 }
 
 //取得WatchPosition權限後執行
-function recordPosition() {
-    navigator.geolocation.getCurrentPosition(function (position){
+function recordPosition(position) {
+    
     let currentStep = routeData.legs[0].steps[currentStepIndex];// 目前所在步驟
     if (currentStepIndex < routeData.legs[0].steps.length-1){
         // 如果目前步驟不是最後一步，則取得下一步驟
@@ -151,7 +151,6 @@ function recordPosition() {
         });
     }
 }
-)}
 
 // 获取定位信息失败时输出错误信息到控制台
 function showError(error) {
@@ -168,10 +167,7 @@ function pathIndicatorOutput() {
 
 function startJourney() {
     // 每隔2秒获取一次定位信息並比較路徑偏移
-    
-    // navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 2*1000, maximumAge: 0, enableHighAccuracy: false });
-    setInterval(recordPosition(position), 2000);
-    
+    navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 2*1000, maximumAge: 0, enableHighAccuracy: false });
     //判斷座標有無移動，有移動紀錄移動距離無移動則記錄靜止時間
     
 }
