@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>手機版 Google Map 導航</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/popper.js/2.9.3/umd/popper.min.js"></script>
     <!-- <script src="https://cdn.staticfile.org/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script> -->
@@ -19,14 +20,17 @@
             height: 100vh;
             vertical-align: middle;
         }
-        .map{
+
+        .map {
             flex: 1;
             margin: 0;
         }
+
         .alert-success {
             flex-grow: 1;
             width: 100%;
         }
+
         #path-indicator {
             text-align: center;
             font-size: 1em;
@@ -40,7 +44,7 @@
         <div class="row mt-2">
             <div class="col-12 p-0">
                 <div class="input-group">
-                    <input id="from"  type="text" class="form-control" style="flex: 7;" placeholder="請輸入起始地">
+                    <input id="from" type="text" class="form-control" style="flex: 7;" placeholder="請輸入起始地">
                     <button class="btn btn-primary" style="flex: 3;" type="button" onclick="getPosition()">
                         <i class="fa-solid fa-location-dot fa-lg" style="color: #ffffff;"></i> 現在位置
                     </button>
@@ -51,7 +55,7 @@
             <div class="col-12 p-0">
                 <div class="input-group">
                     <input id="to" type="text" class="form-control" style="flex: 7;" placeholder="請輸入目的地">
-                    <button class="btn btn-success" style="flex: 3;" type="button" onclick="calcRoute()">
+                    <button id="calcBtn" class="btn btn-success" style="flex: 3;" type="button">
                         <i class="fa-solid fa-route fa-lg" style="color: #ffffff;"></i> 路線規劃
                     </button>
                 </div>
@@ -66,17 +70,29 @@
         </div>
         <div class="row mt-2" style="flex: 1;">
             <div class="col-12 p-0">
-              <div id="path-indicator" style="height: 100%;">
+                <div class="text-white bg-success mb-3 card">
+                    <h5 class="card-header">路徑指示</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                </div>
+                <!-- <div id="path-indicator" style="height: 100%;"> -->
                 <!-- 這裡是路徑指示的內容 -->
-              </div>
+                <!-- </div> -->
             </div>
         </div>
         <div id="googleMap" style="flex: 4;" class="map"></div>
-       
+
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_s5-fCc69D64n3iA4PznfVhF3Sn_5YVA&libraries=drawing,geometry,places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js"
+        integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js"
+        integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/"
+        crossorigin="anonymous"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_s5-fCc69D64n3iA4PznfVhF3Sn_5YVA&libraries=drawing,geometry,places"></script>
     <script src="navigator.js"></script>
 </body>
 
