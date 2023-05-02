@@ -131,7 +131,8 @@ function recordPosition(position) {
     // 判斷現在位置是否在目前步驟線段內
     let currentStepPathpolyline = new google.maps.Polyline({ path: currentStep.path });
     if (isLocationOnEdge(NowlatLng, currentStepPathpolyline, 0.0001)) {
-        map.setTilt(45);
+        map.setTilt(90);
+        map.setZoom(20);
         map.setHeading(heading);
         map.setCenter(NowlatLng);
         cardTextDistance.innerHTML = currentStep.distance.text+"後";
@@ -141,7 +142,8 @@ function recordPosition(position) {
         if (distance < 10 && currentStepIndex + 1 < routeData.legs[0].steps.length) {
             currentStepIndex++;
             heading = headingCorrection(computeHeading(NowlatLng, nextStep.end_location));
-            map.setTilt(45);
+            map.setTilt(90);
+            map.setZoom(20);
             map.setHeading(heading);
             map.setCenter(NowlatLng);
             cardTextDistance.innerHTML = currentStep.distance.text+"後";
@@ -151,7 +153,8 @@ function recordPosition(position) {
         // 如果現在位置離現在步驟結束點<10公尺，且目前步驟線段內且已到達最後步驟，則設定地圖角度為目前步驟終點座標與目的地座標間的角度
         else if (distance < 10 && currentStepIndex == routeData.legs[0].steps.length) {
             heading = headingCorrection(computeHeading(NowlatLng, currentStep.end_location));
-            map.setTilt(45);
+            map.setTilt(90);
+            map.setZoom(20);
             map.setHeading(heading);
             map.setCenter(NowlatLng);
             cardTextDistance.innerHTML = currentStep.distance.text+"後";
@@ -161,7 +164,11 @@ function recordPosition(position) {
     } else {
         // 如果現在位置不在目前步驟線段內，則將起點設為現在位置，終點設為目的地，並重新計算路線
         // 路線設定
-        calcRoute(NowlatLng, arrivalInfoAP.getPlace().geometry.location);
+        calcRoute(NowlatLng, arrivalInfoAP.getPlace().place_id);
+        map.setTilt(90);
+        map.setZoom(20);
+        map.setHeading(heading);
+        map.setCenter(NowlatLng);
         // let request = {
         //     origin: NowlatLng,
         //     destination: autocomplete2.getPlace().geometry.location,//目的地
