@@ -1,6 +1,8 @@
 //javascript.js
 //set map options
 var initLatLng = { lat: 25.0475613, lng: 121.5173399 };
+var departureLatLng = null;
+var arrivalLatLng = null;
 var polyline = null;
 var clickTimes = 0;
 var currentStepIndex = 0; // 目前所在步驟的索引
@@ -87,6 +89,7 @@ departureInfoAP.addListener("place_changed", function () {
         .geocode({ placeId: place.place_id })
         .then(({ results }) => {
             document.getElementById("from").value = results[0].formatted_address;
+            departureLatLng = results[0].geometry.location;
         })
         .catch((e) => window.alert("Geocoder failed due to: " + e));
 });
@@ -101,6 +104,7 @@ arrivalInfoAP.addListener("place_changed", function () {
         .geocode({ placeId: place.place_id })
         .then(({ results }) => {
             document.getElementById("to").value = results[0].formatted_address;
+            arrivalLatLng = results[0].geometry.location;
         })
         .catch((e) => window.alert("Geocoder failed due to: " + e));
 });
