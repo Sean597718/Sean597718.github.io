@@ -23,10 +23,27 @@ var mapOptions = {
     //mapTypeId:'hybrid'
 };
 var routeData;
-
+//初始化按鈕狀態
+var calcBtn = document.getElementById("calcBtn");
 //初始化地圖
 const map = new google.maps.Map(document.getElementById('googleMap'), mapOptions);
 
+//自動填入選項篩選項目
+var options = {
+    componentRestrictions: { country: 'tw' },
+    strictBounds: false,
+    fields: ["place_id"],
+    // types: ["establishment"],
+}
+
+var departureInfo = document.getElementById("from");
+var departureInfoAP = new google.maps.places.Autocomplete(departureInfo, options);
+
+var arrivalInfo = document.getElementById("to");
+var arrivalInfoAP = new google.maps.places.Autocomplete(arrivalInfo, options);
+
+//初始化geocoder
+const geocoder = new google.maps.Geocoder();
 //初始化direction API
 const directionsService = new google.maps.DirectionsService();
 //宣告計算角度函數
@@ -42,7 +59,7 @@ const directionsDisplay = new google.maps.DirectionsRenderer({
     draggable: false,
     suppressMarkers: true,
     polylineOptions: {
-        strokeColor: "#37bf87", // set the color of the route
+        strokeColor: "#004B97", // set the color of the route
         strokeWeight: 6, // set the width of the line of the route
     },
 });
@@ -54,12 +71,46 @@ function headingCorrection(heading) {
     }
     return heading;
 }
+//規劃路線按鈕監聽
+calcBtn.addEventListener("click", function () {
+    let origin = document.getElementById("from").value;
+    let destination = document.getElementById("to").value;
+    calcRoute(origin, destination);
+});
+//出發地自動填入監聽
+departureInfoAP.addListener("place_changed", function () {
+    const place = departureInfoAP.getPlace();
+    if (!place.place_id) {
+        return;
+    }
+    geocoder
+        .geocode({ placeId: place.place_id })
+        .then(({ results }) => {
+            document.getElementById("from").value = results[0].formatted_address;
+        })
+        .catch((e) => window.alert("Geocoder failed due to: " + e));
+});
+
+//目的地自動填入監聽
+arrivalInfoAP.addListener("place_changed", function () {
+    const place = arrivalInfoAP.getPlace();
+    if (!place.place_id) {
+        return;
+    }
+    geocoder
+        .geocode({ placeId: place.place_id })
+        .then(({ results }) => {
+            document.getElementById("to").value = results[0].formatted_address;
+        })
+        .catch((e) => window.alert("Geocoder failed due to: " + e));
+});
 
 //取得WatchPosition權限後執行
 function recordPosition(position) {
-    
+    let cardTextDistance = document.querySelector('.card-title');
+    let cardTextInstruction = document.querySelector('.card-text');
     let currentStep = routeData.legs[0].steps[currentStepIndex];// 目前所在步驟
-    if (currentStepIndex < routeData.legs[0].steps.length-1){
+    if (currentStepIndex < routeData.legs[0].steps.length - 1) {
         // 如果目前步驟不是最後一步，則取得下一步驟
         var nextStep = routeData.legs[0].steps[currentStepIndex + 1]; // 下一步驟
     }
@@ -68,7 +119,7 @@ function recordPosition(position) {
         position.coords.longitude
     );
     positionRecord.push(NowlatLng);
-    if (positionRecord[positionRecord.length-1] && positionRecord[positionRecord.length-1].equals(NowlatLng)){
+    if (positionRecord[positionRecord.length - 1] && positionRecord[positionRecord.length - 1].equals(NowlatLng)) {
         // 如果現在位置與上一個位置相同，則計入待機時間
         idleTimer = idleTimer + 2;
         console.log(idleTimer);
@@ -76,79 +127,92 @@ function recordPosition(position) {
     // 計算現在位置與目前步驟終點座標間的角度
     let heading = headingCorrection(computeHeading(NowlatLng, currentStep.end_location));
     // 計算現在位置與目前步驟終點座標間的距離
-    let distance = computeDistance(NowlatLng,currentStep.end_location);
+    let distance = computeDistance(NowlatLng, currentStep.end_location);
     // 判斷現在位置是否在目前步驟線段內
-    let currentStepPathpolyline =new google.maps.Polyline({path:currentStep.path});
+    let currentStepPathpolyline = new google.maps.Polyline({ path: currentStep.path });
     if (isLocationOnEdge(NowlatLng, currentStepPathpolyline, 0.0001)) {
+        map.setTilt(45);
+        map.setHeading(heading);
+        map.setCenter(NowlatLng);
+        cardTextDistance.innerHTML = currentStep.distance.text+"後";
+        cardTextInstruction.innerHTML = currentStep.instructions;
+        console.log("在線段內");
         // 如果現在位置離現在步驟結束點<10公尺，且目前步驟線段內且未到達最後步驟，則設定地圖角度為目前步驟終點座標與下一步驟終點座標間的角度
-        if (distance <10 && currentStepIndex + 1 < routeData.legs[0].steps.length) {
+        if (distance < 10 && currentStepIndex + 1 < routeData.legs[0].steps.length) {
             currentStepIndex++;
             heading = headingCorrection(computeHeading(NowlatLng, nextStep.end_location));
             map.setTilt(45);
             map.setHeading(heading);
             map.setCenter(NowlatLng);
+            cardTextDistance.innerHTML = currentStep.distance.text+"後";
+            cardTextInstruction.innerHTML = currentStep.instructions;
+            console.log("在線段內且未到達最後步驟");
         }
         // 如果現在位置離現在步驟結束點<10公尺，且目前步驟線段內且已到達最後步驟，則設定地圖角度為目前步驟終點座標與目的地座標間的角度
-        else if(distance <10 && currentStepIndex == routeData.legs[0].steps.length){
+        else if (distance < 10 && currentStepIndex == routeData.legs[0].steps.length) {
             heading = headingCorrection(computeHeading(NowlatLng, currentStep.end_location));
             map.setTilt(45);
             map.setHeading(heading);
             map.setCenter(NowlatLng);
+            cardTextDistance.innerHTML = currentStep.distance.text+"後";
+            cardTextInstruction.innerHTML = currentStep.instructions;
+            console.log("在線段內且已到達最後步驟");
         }
     } else {
         // 如果現在位置不在目前步驟線段內，則將起點設為現在位置，終點設為目的地，並重新計算路線
         // 路線設定
-        let request = {
-            origin: NowlatLng,
-            destination: autocomplete2.getPlace().geometry.location,//目的地
-            travelMode: google.maps.TravelMode.DRIVING, //路徑類型
-            unitSystem: google.maps.UnitSystem.MERTRIC //路徑距離單位
-        };
-        // 取得路線資訊並顯示
-        directionsService.route(request, function (result, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-                //讀取路徑資訊
-                routeData = result.routes[0];
-                let steps = result.routes[0].legs[0].steps;
-                let StepDistance = [];
-                let StepInstruction = [];
-                steps.forEach((step) => {
-                    const distance = step.distance.text;
-                    const instruction = step.instructions;
-                    StepDistance.push(distance);
-                    StepInstruction.push(instruction);
-                });
-                var pathIndicator = document.querySelector('#path-indicator');
-                pathIndicator.innerHTML = "<div class='alert-success'>" + "<br /> 行駛距離  : " + StepDistance[0] + "<br/>" + StepInstruction[0] + "<br/>" + "</div>";
-                var overviewPath = result.routes[0].overview_path;
+        calcRoute(NowlatLng, autocomplete2.getPlace().geometry.location);
+        // let request = {
+        //     origin: NowlatLng,
+        //     destination: autocomplete2.getPlace().geometry.location,//目的地
+        //     travelMode: google.maps.TravelMode.DRIVING, //路徑類型
+        //     unitSystem: google.maps.UnitSystem.MERTRIC //路徑距離單位
+        // };
+        // // 取得路線資訊並顯示
+        // directionsService.route(request, function (result, status) {
+        //     if (status == google.maps.DirectionsStatus.OK) {
+        //         //讀取路徑資訊
+        //         routeData = result.routes[0];
+        //         let steps = result.routes[0].legs[0].steps;
+        //         let StepDistance = [];
+        //         let StepInstruction = [];
+        //         steps.forEach((step) => {
+        //             const distance = step.distance.text;
+        //             const instruction = step.instructions;
+        //             StepDistance.push(distance);
+        //             StepInstruction.push(instruction);
+        //         });
+        //         var pathIndicator = document.querySelector('#path-indicator');
+        //         pathIndicator.innerHTML = "<div class='alert-success'>" + "<br /> 行駛距離  : " + StepDistance[0] + "<br/>" + StepInstruction[0] + "<br/>" + "</div>";
+        //         var overviewPath = result.routes[0].overview_path;
 
-                // 建立路線 Polyline 物件
-                polyline = new google.maps.Polyline({
-                    path: overviewPath,
-                });
-                if (clickTimes != 0) {
-                    directionsDisplay.setMap(null);
-                    console.log("clearMap");
-                }
-                // 繪製路線
-                directionsDisplay.setMap(map);
-                map.setCenter(NowlatLng);
-                map.setZoom(18);
-                map.setTilt(45);
-                map.setHeading(headingCorrection(computeHeading(steps[0].start_location, steps[0].end_location)));
-                clickTimes++;
-            } else {
-                //清空路徑
-                directionsDisplay.setMap(null);
-                //預設地圖中心位置為台北車站
-                map.setTilt(45);
-                map.setZoom(18);
-                map.setCenter(initLatLng);
+        //         // 建立路線 Polyline 物件
+        //         polyline = new google.maps.Polyline({
+        //             path: overviewPath,
+        //         });
+        //         if (clickTimes != 0) {
+        //             directionsDisplay.setMap(null);
+        //             console.log("clearMap");
+        //         }
+        //         // 繪製路線
+        //         directionsDisplay.setMap(map);
+        //         map.setCenter(NowlatLng);
+        //         map.setZoom(18);
+        //         map.setTilt(45);
+        //         map.setHeading(headingCorrection(computeHeading(steps[0].start_location, steps[0].end_location)));
+        //         clickTimes++;
+        //     } else {
+        //         //清空路徑
+        //         directionsDisplay.setMap(null);
+        //         //預設地圖中心位置為台北車站
+        //         map.setTilt(45);
+        //         map.setZoom(18);
+        //         map.setCenter(initLatLng);
 
-                //show error message
-                pathIndicator.innerHTML = "<div class='alert-danger'><i class='fas fa-exclamation-triangle'></i> Could not retrieve driving distance.</div>";
-            }
-        });
+        //         //show error message
+        //         pathIndicator.innerHTML = "<div class='alert-danger'><i class='fas fa-exclamation-triangle'></i> Could not retrieve driving distance.</div>";
+        //     }
+        // });
     }
 }
 
@@ -167,16 +231,15 @@ function pathIndicatorOutput() {
 
 function startJourney() {
     // 每隔2秒获取一次定位信息並比較路徑偏移
-    navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 2*1000, maximumAge: 0, enableHighAccuracy: false });
+    navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 2 * 1000, maximumAge: 0, enableHighAccuracy: false });
     //判斷座標有無移動，有移動紀錄移動距離無移動則記錄靜止時間
-    
+
 }
 
 // 取得現在位置
 function getPosition() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            var geocoder = new google.maps.Geocoder();
             let latLng = new google.maps.LatLng(
                 position.coords.latitude,
                 position.coords.longitude
@@ -201,13 +264,23 @@ function getPosition() {
 }
 
 //define calcRoute function
-function calcRoute() {
+function calcRoute(origin, destination) {
     //create request
-    let request = {
-        origin: document.getElementById("from").value,
-        destination: document.getElementById("to").value,
-        travelMode: google.maps.TravelMode.DRIVING, //路徑類型
-        unitSystem: google.maps.UnitSystem.MERTRIC
+    if (origin && destination) {
+        var request = {
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING, //路徑類型
+            unitSystem: google.maps.UnitSystem.MERTRIC //路徑距離單位
+        }
+    }
+    else {
+        var request = {
+            origin: document.getElementById("from").value,
+            destination: document.getElementById("to").value,
+            travelMode: google.maps.TravelMode.DRIVING, //路徑類型
+            unitSystem: google.maps.UnitSystem.MERTRIC //路徑距離單位
+        }
     }
     //pass the request to the route method
     directionsService.route(request, function (result, status) {
@@ -229,8 +302,8 @@ function calcRoute() {
                 StepDistance.push(distance);
                 StepInstruction.push(instruction);
             });
-            var pathIndicator = document.querySelector('#path-indicator');
-            pathIndicator.innerHTML = "<div class='alert-success'>" + "<br /> 行駛距離  : " + StepDistance[0] + "<br/>" + StepInstruction[0] + "<br/>" + "</div>";
+            // var pathIndicator = document.querySelector('#path-indicator');
+            // pathIndicator.innerHTML = "<div class='alert-success'>" + "<br /> 行駛距離  : " + StepDistance[0] + "<br/>" + StepInstruction[0] + "<br/>" + "</div>";
             // var Instruction = steps.instructions;
             //顯示路徑資訊(距離、時間)
             //   const output = document.querySelector('#output');
@@ -250,7 +323,9 @@ function calcRoute() {
             directionsDisplay.setDirections(result);
             directionsDisplay.setMap(map);
             map.setZoom(18);
+            map.setTilt(45);
             map.setHeading(computeHeading(steps[0].start_location, steps[0].end_location));
+            console.log(result);
             clickTimes++;
             // //使用路徑資訊繪製路徑
             // directionsDisplay.setDirections(result);
@@ -266,22 +341,7 @@ function calcRoute() {
             map.setCenter(initLatLng);
 
             //show error message
-            pathIndicator.innerHTML = "<div class='alert-danger'><i class='fas fa-exclamation-triangle'></i> Could not retrieve driving distance.</div>";
+            window.alert("Directions request failed due to " + status);
         }
     });
 }
-
-
-//自動填入選項篩選項目
-var options = {
-    componentRestrictions: { country: 'tw' },
-    strictBounds: false,
-    fields: ["address_components", "geometry", "name"],
-    // types: ["establishment"],
-}
-
-var input1 = document.getElementById("from");
-var autocomplete1 = new google.maps.places.Autocomplete(input1, options);
-
-var input2 = document.getElementById("to");
-var autocomplete2 = new google.maps.places.Autocomplete(input2, options);
