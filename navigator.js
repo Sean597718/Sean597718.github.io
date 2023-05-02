@@ -161,7 +161,7 @@ function recordPosition(position) {
     } else {
         // 如果現在位置不在目前步驟線段內，則將起點設為現在位置，終點設為目的地，並重新計算路線
         // 路線設定
-        calcRoute(NowlatLng, autocomplete2.getPlace().geometry.location);
+        calcRoute(NowlatLng, arrivalInfoAP.getPlace().geometry.location);
         // let request = {
         //     origin: NowlatLng,
         //     destination: autocomplete2.getPlace().geometry.location,//目的地
