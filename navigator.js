@@ -130,7 +130,7 @@ function recordPosition(position) {
         idleTimer = idleTimer + 2;
         console.log(idleTimer);
     }
-    cardTextFare.innerHTML = "目前車資：" + idleTimer*2 + "元";
+    cardTextFare.innerHTML = "目前車資：" + Math.floor(idleTimer/60) + "元";
     // 計算現在位置與目前步驟終點座標間的角度
     let heading = headingCorrection(computeHeading(NowLatLng, currentStep.end_location));
     // 計算現在位置與目前步驟終點座標間的距離
