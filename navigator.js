@@ -246,7 +246,7 @@ function showError(error) {
 
 function startJourney() {
     // 每隔2秒获取一次定位信息並比較路徑偏移
-    navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 1000, maximumAge: 5000, enableHighAccuracy: true });
+    navigator.geolocation.watchPosition(recordPosition, showError, { timeout: 1000, maximumAge: 2000, enableHighAccuracy: true });
     //判斷座標有無移動，有移動紀錄移動距離無移動則記錄靜止時間
 
 }
