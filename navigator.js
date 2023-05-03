@@ -123,6 +123,7 @@ function recordPosition(position) {
         position.coords.latitude,
         position.coords.longitude
     );
+    window.alert("座標"+NowLatLng)
     positionRecord.push(NowLatLng);
     if (positionRecord[positionRecord.length - 1] && positionRecord[positionRecord.length - 1].equals(NowLatLng)) {
         // 如果現在位置與上一個位置相同，則計入待機時間
