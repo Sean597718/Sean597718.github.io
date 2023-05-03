@@ -62,24 +62,28 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="d-grid gap-2">
+            <div class="d-grid p-0">
                 <button class="btn btn-info btn-block" type="button" onclick="startJourney()">
                     <i class="fa-solid fa-taxi fa-lg" style="color: #000000;"></i><b> 出發</b>
                 </button>
             </div>
         </div>
-        <div class="row mt-2" style="flex: 1;">
+        <div class="row mt-2">
             <div class="col-12 p-0">
                 <div class="text-white bg-success mb-3 card">
                     <h5 class="card-header">路徑指示</h5>
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <h5 id="card-distance" class="card-title">路口距離</h5>
+                        <p id="#card-instruction" class="card-text">詳細方向指示</p>
                     </div>
                 </div>
-                <!-- <div id="path-indicator" style="height: 100%;"> -->
-                <!-- 這裡是路徑指示的內容 -->
-                <!-- </div> -->
+                <div class="text-white bg-info mb-3 card">
+                    <h5 class="card-header">計費資訊</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">總收費</h5>
+                        <p id="card-fare" class="card-text">怠速時間與行駛距離</p>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="googleMap" style="flex: 4;" class="map"></div>
