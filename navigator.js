@@ -7,7 +7,7 @@ var polyline = null;
 var clickTimes = 0;
 var currentStepIndex = 0; // 目前所在步驟的索引
 var mapRotation = 0; // 地圖旋轉角度
-var NowlatLng = null; // 目前所在位置
+var NowLatLng = null; // 目前所在位置
 var endPosition = null; // 目的地位置
 var positionRecord = []; // 紀錄移動路徑的陣列
 var idleTimer = 0; // 計時器
@@ -111,56 +111,57 @@ arrivalInfoAP.addListener("place_changed", function () {
 
 //取得WatchPosition權限後執行
 function recordPosition(position) {
-    let cardTextDistance = document.querySelector('.card-title');
-    let cardTextInstruction = document.querySelector('.card-text');
+    let cardTextDistance = document.querySelector('#card-distance');
+    let cardTextInstruction = document.querySelector("#card-instruction");
+    let cardTextFare = document.querySelector("#card-fare");
     let currentStep = routeData.legs[0].steps[currentStepIndex];// 目前所在步驟
     if (currentStepIndex < routeData.legs[0].steps.length - 1) {
         // 如果目前步驟不是最後一步，則取得下一步驟
         var nextStep = routeData.legs[0].steps[currentStepIndex + 1]; // 下一步驟
     }
-    NowlatLng = new google.maps.LatLng(
+    NowLatLng = new google.maps.LatLng(
         position.coords.latitude,
         position.coords.longitude
     );
-    positionRecord.push(NowlatLng);
-    if (positionRecord[positionRecord.length - 1] && positionRecord[positionRecord.length - 1].equals(NowlatLng)) {
+    positionRecord.push(NowLatLng);
+    if (positionRecord[positionRecord.length - 1] && positionRecord[positionRecord.length - 1].equals(NowLatLng)) {
         // 如果現在位置與上一個位置相同，則計入待機時間
         idleTimer = idleTimer + 2;
         console.log(idleTimer);
     }
     // 計算現在位置與目前步驟終點座標間的角度
-    let heading = headingCorrection(computeHeading(NowlatLng, currentStep.end_location));
+    let heading = headingCorrection(computeHeading(NowLatLng, currentStep.end_location));
     // 計算現在位置與目前步驟終點座標間的距離
-    let distance = computeDistance(NowlatLng, currentStep.end_location);
+    let distance = computeDistance(NowLatLng, currentStep.end_location);
     // 判斷現在位置是否在目前步驟線段內
     let currentStepPathpolyline = new google.maps.Polyline({ path: currentStep.path });
-    if (isLocationOnEdge(NowlatLng, currentStepPathpolyline, 0.0001)) {
+    if (isLocationOnEdge(NowLatLng, currentStepPathpolyline, 0.0001)) {
         map.setTilt(90);
         map.setZoom(20);
         map.setHeading(heading);
-        map.setCenter(NowlatLng);
+        map.setCenter(NowLatLng);
         cardTextDistance.innerHTML = currentStep.distance.text+"後";
         cardTextInstruction.innerHTML = currentStep.instructions;
         console.log("在線段內");
         // 如果現在位置離現在步驟結束點<10公尺，且目前步驟線段內且未到達最後步驟，則設定地圖角度為目前步驟終點座標與下一步驟終點座標間的角度
         if (distance < 10 && currentStepIndex + 1 < routeData.legs[0].steps.length) {
             currentStepIndex++;
-            heading = headingCorrection(computeHeading(NowlatLng, nextStep.end_location));
+            heading = headingCorrection(computeHeading(NowLatLng, nextStep.end_location));
             map.setTilt(90);
             map.setZoom(20);
             map.setHeading(heading);
-            map.setCenter(NowlatLng);
+            map.setCenter(NowLatLng);
             cardTextDistance.innerHTML = currentStep.distance.text+"後";
             cardTextInstruction.innerHTML = currentStep.instructions;
             console.log("在線段內且未到達最後步驟");
         }
         // 如果現在位置離現在步驟結束點<10公尺，且目前步驟線段內且已到達最後步驟，則設定地圖角度為目前步驟終點座標與目的地座標間的角度
         else if (distance < 10 && currentStepIndex == routeData.legs[0].steps.length) {
-            heading = headingCorrection(computeHeading(NowlatLng, currentStep.end_location));
+            heading = headingCorrection(computeHeading(NowLatLng, currentStep.end_location));
             map.setTilt(90);
             map.setZoom(20);
             map.setHeading(heading);
-            map.setCenter(NowlatLng);
+            map.setCenter(NowLatLng);
             cardTextDistance.innerHTML = currentStep.distance.text+"後";
             cardTextInstruction.innerHTML = currentStep.instructions;
             console.log("在線段內且已到達最後步驟");
@@ -168,13 +169,13 @@ function recordPosition(position) {
     } else {
         // 如果現在位置不在目前步驟線段內，則將起點設為現在位置，終點設為目的地，並重新計算路線
         // 路線設定
-        calcRoute(NowlatLng, arrivalInfoAP.getPlace().place_id);
+        calcRoute(NowLatLng, arrivalLatLng);
         map.setTilt(90);
         map.setZoom(20);
         map.setHeading(heading);
-        map.setCenter(NowlatLng);
+        map.setCenter(NowLatLng);
         // let request = {
-        //     origin: NowlatLng,
+        //     origin: NowLatLng,
         //     destination: autocomplete2.getPlace().geometry.location,//目的地
         //     travelMode: google.maps.TravelMode.DRIVING, //路徑類型
         //     unitSystem: google.maps.UnitSystem.MERTRIC //路徑距離單位
@@ -207,7 +208,7 @@ function recordPosition(position) {
         //         }
         //         // 繪製路線
         //         directionsDisplay.setMap(map);
-        //         map.setCenter(NowlatLng);
+        //         map.setCenter(NowLatLng);
         //         map.setZoom(18);
         //         map.setTilt(45);
         //         map.setHeading(headingCorrection(computeHeading(steps[0].start_location, steps[0].end_location)));
@@ -232,13 +233,13 @@ function showError(error) {
     console.log("Error getting location: " + error.message);
 }
 
-function pathIndicatorOutput() {
-    pathIndicator.innerHTML =
-        "<div class='alert-success'>" +
-        "<br /> 行駛距離 <i class='fa-solid fa-arrow-up'></i> : " +
-        StepDistance + "<br/>" + StepInstruction + "<br/>" +
-        "</div>";
-}
+// function pathIndicatorOutput() {
+//     pathIndicator.innerHTML =
+//         "<div class='alert-success'>" +
+//         "<br /> 行駛距離 <i class='fa-solid fa-arrow-up'></i> : " +
+//         StepDistance + "<br/>" + StepInstruction + "<br/>" +
+//         "</div>";
+// }
 
 function startJourney() {
     // 每隔2秒获取一次定位信息並比較路徑偏移
