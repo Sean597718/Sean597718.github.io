@@ -519,9 +519,9 @@
                 json = await query.json();
                 showToast(json);
                 const routeData = json.routes[1];
-                route = data.geometry.coordinates;
-                const steps = data.legs[0].steps;
-                showToast(data);
+                route = routeData.geometry.coordinates;
+                const steps = routeData.legs[0].steps;
+                showToast(routeData);
                 const geojson = {
                     type: 'Feature',
                     properties: {},
