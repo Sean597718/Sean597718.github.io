@@ -225,7 +225,7 @@
                     positionHistory.push([longitude, latitude]);
 
                     // 更新地圖上的標記或其他需要的位置更新操作
-                    console.log('位置紀錄: ', positionHistory);
+                    showToast('位置紀錄: ', positionHistory);
                 });
             }
 
@@ -319,7 +319,7 @@
                     lat: LatLngtoFloor(position.coords.latitude),
                     lng: LatLngtoFloor(position.coords.longitude),
                 };
-                console.log(NowLatLng);
+                showToast(NowLatLng);
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
@@ -448,15 +448,15 @@
                 for (let i = coordinates.length - 1; i >= 0; i -= 1) {
                     let startPoint = coordinates[i];
                     let endPoint = coordinates[i - 1];
-                    console.log(startPoint.lat + "," + startPoint.lng + " index :" + i);
-                    console.log(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
+                    showToast(startPoint.lat + "," + startPoint.lng + " index :" + i);
+                    showToast(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
                     const polyline = new gomp.Polyline({
                         path: [startPoint, endPoint],
                         geodesic: true,
                     });
                     if (isLocationOnEdge(currentPoint, polyline, 0.0003)) {
                         addMarker(startPoint, "T");
-                        console.log(startPoint.lat + "," + startPoint.lng);
+                        showToast(startPoint.lat + "," + startPoint.lng);
                         return startPoint;
                     } else {
                         continue;
@@ -517,11 +517,11 @@
                     { method: 'GET' }
                 );
                 json = await query.json();
-                console.log(json);
+                showToast(json);
                 const routeData = json.routes[1];
                 route = data.geometry.coordinates;
                 const steps = data.legs[0].steps;
-                console.log(data);
+                showToast(data);
                 const geojson = {
                     type: 'Feature',
                     properties: {},
@@ -533,7 +533,7 @@
                 // if the route already exists on the map, we'll reset it using setData
                 if (map.getSource('route')) {
                     map.getSource('route').setData(geojson);
-                    console.log(route);
+                    showToast(route);
                 }
                 // otherwise, we'll make a new request
                 else {
@@ -612,9 +612,9 @@
                     }
                 });
 
-                console.log("各 type 的数量:");
+                showToast("各 type 的数量:");
                 for (const type in typeCounts) {
-                    console.log(`${type}: ${typeCounts[type]}個`);
+                    showToast(`${type}: ${typeCounts[type]}個`);
                 }
             }
 
