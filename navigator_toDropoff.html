@@ -281,8 +281,8 @@
                             map: map,
                         });
                         NowLatLng = {
-                            lat: LatLngtoFloor(position.lat),
-                            lng: LatLngtoFloor(position.lng),
+                            1: LatLngtoFloor(position.lat),
+                            0: LatLngtoFloor(position.lng),
                         };
                         if (goState == true) {
                             console.log("執行記錄位置")
@@ -385,8 +385,8 @@
             }
 
             function computeDistance(point1, point2) {
-                const from = turf.point([point1.lng, point1.lat]);
-                const to = turf.point([point2.lng, point2.lat]);
+                const from = turf.point([point1[0], point1[1]]);
+                const to = turf.point([point2.[0], point2[1]]);
                 const distance = turf.distance(from, to, { units: 'meters' });
                 return Math.floor(distance);
             }
@@ -576,7 +576,7 @@
 
             async function calcRoute(origin, destination) {
                 const query = await fetch(
-                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
+                    `https://api.map8.zone/route/car/${NowLatLng[0]},${NowLatLng[1]};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
                     { method: 'GET' }
                 );
                 json = await query.json();
