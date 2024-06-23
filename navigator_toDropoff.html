@@ -386,7 +386,7 @@
 
             function computeDistance(point1, point2) {
                 const from = turf.point([point1[0], point1[1]]);
-                const to = turf.point([point2.[0], point2[1]]);
+                const to = turf.point([point2[0], point2[1]]);
                 const distance = turf.distance(from, to, { units: 'meters' });
                 return Math.floor(distance);
             }
