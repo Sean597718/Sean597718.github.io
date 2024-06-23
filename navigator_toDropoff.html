@@ -408,11 +408,11 @@
                 } else {
                     nextStep = null;
                 }
-                /*NowLatLng = {
+                NowLatLng = {
                     lat: LatLngtoFloor(position.coords.latitude),
                     lng: LatLngtoFloor(position.coords.longitude),
                 };
-                console.log(NowLatLng);*/
+                
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
