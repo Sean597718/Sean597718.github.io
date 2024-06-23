@@ -409,6 +409,8 @@
                     nextStep = null;
                 }
                 if (positionRecord[positionRecord.length - 1]) {
+                    console.log(positionRecord[positionRecord.length - 1])
+                    console.log(NowLatLng)
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
                 if (positionRecord[positionRecord.length - 1] !== NowLatLng && moveDistance > 5) {
