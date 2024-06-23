@@ -397,6 +397,7 @@
                 return truncatedNumber;
             }
             function recordPosition(position) {
+                log.("開始記錄位置");
                 let currentStep = routeData.legs[0].steps[currentStepIndex];
                 if (currentStepIndex < routeData.legs[0].steps.length - 1) {
                     nextStep = routeData.legs[0].steps[currentStepIndex + 1];
