@@ -275,7 +275,6 @@
 
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (nowposition == null) {
-                        console.log(goState)
                         nowposition = new gomp.Marker({
                             position: position,
                             map: map,
@@ -285,7 +284,6 @@
                             0: LatLngtoFloor(position.lng),
                         };
                         if (goState == true) {
-                            console.log("執行記錄位置")
                             recordPosition(NowLatLng);
                         }
                     } else {
@@ -298,7 +296,6 @@
                             recordPosition(NowLatLng);
                         }
                     }
-                    console.log(goState)
                     // 更新地图视图
                     map.setCenter(position);
                     
@@ -401,7 +398,6 @@
                 return truncatedNumber;
             }
             function recordPosition(position) {
-                console.log("開始記錄位置");
                 let currentStep = routeData.legs[0].steps[currentStepIndex];
                 if (currentStepIndex < routeData.legs[0].steps.length - 1) {
                     nextStep = routeData.legs[0].steps[currentStepIndex + 1];
@@ -518,7 +514,7 @@
                     let endPoint = coordinates[i - 1];
                     console.log(startPoint.lat + "," + startPoint.lng + " index :" + i);
                     console.log(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
-                    const polyline = new gomp.Polyline({
+                    let polyline = new gomp.Polyline({
                         path: [startPoint, endPoint],
                         geodesic: true,
                     });
@@ -580,11 +576,9 @@
                     { method: 'GET' }
                 );
                 json = await query.json();
-                console.log(json);
                 routeData = json.routes[0];
                 route = routeData.geometry.coordinates;
                 stepsPath = routeData.legs[0].steps;
-                console.log(stepsPath);
                 const geojson = {
                     type: 'Feature',
                     properties: {},
