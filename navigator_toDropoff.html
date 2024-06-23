@@ -414,18 +414,8 @@
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
-                if (positionRecord[positionRecord.length - 1] !== NowLatLng) {
+                if (positionRecord[positionRecord.length - 1] !== NowLatLng && moveDistance > 5) {
                     positionRecord.push(NowLatLng);
-                }
-                if (moveDistance <= 5 && startTime == null) {
-                    startTime = Date.now();
-                } else if (moveDistance > 5 && startTime != null) {
-                    endTime = Date.now();
-                    console.log("結束待機" + endTime);
-                    Timer += Math.floor((endTime - startTime) / 1000);
-                    console.log("待機時間" + Timer + "秒");
-                    startTime = null;
-                    endTime = null;
                 }
                 positionRecord.forEach((currentValue, index) => {
                     if (index > 0) {
@@ -438,9 +428,10 @@
                     }
                 });
                 if (cardTextFare) {
+                    let nowTimer = (Date.now()-startTime)/600;
                     cardTextFare.innerHTML =
                         "目前車資：" +
-                        (50 + Math.floor(Timer / 60) * 2 + estimatedDistance * 20) +
+                        (50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20) +
                         "元";
                 }
                 let heading =
