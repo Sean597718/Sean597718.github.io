@@ -274,7 +274,7 @@
 
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (nowposition == null) {
-                        console.log("nowposition為空值")
+                        console.log(goState)
                         nowposition = new gomp.Marker({
                             position: position,
                             map: map,
@@ -480,6 +480,7 @@
                     endTime = null;
                 }
                 goState = true;
+                
                 calcRoute(NowLatLng, arrivalLatLng);
             }
 
