@@ -291,8 +291,8 @@
                     } else {
                         nowposition.setLngLat(position);
                         NowLatLng = {
-                            lat: LatLngtoFloor(position.lat),
-                            lng: LatLngtoFloor(position.lng),
+                            1: LatLngtoFloor(position.lat),
+                            0: LatLngtoFloor(position.lng),
                         };
                         if (goState == true) {
                             recordPosition(NowLatLng);
