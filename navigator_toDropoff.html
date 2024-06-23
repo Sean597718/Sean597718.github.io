@@ -29,6 +29,7 @@
             background-color: #f7f7f7;
             border: 2px solid #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10;
         }
 
         .alert-success {
@@ -38,8 +39,13 @@
 
         .card {
             background-color: #f7f7f7;
+            margin-top: 6px;
             border: 2px solid #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn {
+            margin-top: 6px;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -48,24 +54,6 @@
     <div class="container-fluid">
         <div id="toastContainer" aria-live="polite" aria-atomic="true"
             style="position: fixed; top: 20px; right: 20px; z-index: 100;"></div>
-        <div class="row mt-2">
-            <div class="col-12 p-0">
-                <div class="input-group">
-                    <button class="btn btn-primary" type="button" onclick="getPosition()">
-                        <i class="fa-solid fa-location-dot fa-lg" style="color: #ffffff;"></i> 現在位置
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-1">
-            <div class="col-12 p-0">
-                <div class="input-group">
-                    <button id="calcBtn" class="btn btn-success" type="button" onclick="calcRoute()">
-                        <i class="fa-solid fa-route fa-lg" style="color: #ffffff;"></i> 路線規劃
-                    </button>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-12">
                 <div class="text-white bg-success mb-3 card">
@@ -79,6 +67,7 @@
                     <div class="card-body">
                         <h5 id="card-distance" class="card-title">路口距離</h5>
                         <p id="card-instruction" class="card-text">詳細方向指示</p>
+                        <p id="card-fare" class="card-text">預估費用</p>
                     </div>
                 </div>
             </div>
@@ -97,7 +86,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-bs-dismiss="modal"
-                            onclick="calcRoute(departureLatLng, arrivalLatLng)">
+                            onclick="calcRoute(NowLatLng, arrivalLatLng)">
                             <i class="bi bi-arrow-90deg-right"></i> 出發</button>
                         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle-fill"></i> 關閉</button>
@@ -127,6 +116,14 @@
             </div>
         </div>
         <div id="map8Map" class="map"></div>
+        <div class="row">
+            <div class="d-grid">
+                <button class="btn btn-danger btn-block" type="button" data-bs-toggle="modal" data-bs-target="#endModal"
+                    onclick="endJourney()">
+                    <i class="fa-solid fa-flag-checkered fa-lg"></i><b> 結束行程</b>
+                </button>
+            </div>
+        </div>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js"
             integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN"
             crossorigin="anonymous"></script>
@@ -149,7 +146,8 @@
                 route,
                 start_at,
                 json;
-
+            let arrivalLatLng = [121.5173399, 25.0475613]; // 目的地座標
+            let goState = false; // 是否開始導航
             let stepsPath = []; // 路線暫存
             let currentStepIndex = 1; // 目前所在步驟的索引
             let currentStep = null; // 目前所在步驟
@@ -194,7 +192,7 @@
                     style: 'https://api.map8.zone/styles/go-life-maps-tw-style-std/style.json',
                     center: initLatLng,
                     zoom: 18,
-                    pitch: 0,
+                    pitch: 60,
                     bearing: 0,
                 };
 
@@ -225,6 +223,8 @@
 
                 // 监听地图加载完成事件
                 map.on('load', function () {
+                    /* 绑定GeolocateControl的点击事件
+                    geolocateControl._container.onclick = handleGeolocateClick;*/
                     // 地图加载完成后自动触发geolocation
                     geolocateControl.trigger();
 
@@ -240,6 +240,8 @@
                         // 更新用户位置
                         updateUserLocation(position);
                     });
+                    startModal.show();
+                    document.getElementById("destination").innerText = arrivalLatLng;
                 });
 
 
@@ -274,12 +276,18 @@
                             lat: LatLngtoFloor(position.lat),
                             lng: LatLngtoFloor(position.lng),
                         };
+                        if(goState == true){
+                            recordPosition(NowLatLng);
+                        }
                     } else {
                         nowposition.setLngLat(position);
                         NowLatLng = {
                             lat: LatLngtoFloor(position.lat),
                             lng: LatLngtoFloor(position.lng),
                         };
+                        if(goState == true){
+                            recordPosition(NowLatLng);
+                        }
                     }
 
                     // 更新地图视图
@@ -296,6 +304,24 @@
 
                     console.log('位置更新: ', nowposition);
                 }
+            }
+
+            // 處理 GeolocateControl 點擊事件的函數
+            function handleGeolocateClick(event) {
+                // 防止事件冒泡和默認行為
+                event.stopPropagation();
+                event.preventDefault();
+
+                // 獲取當前位置並執行 flyTo
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    map.flyTo({
+                        center: [position.coords.longitude, position.coords.latitude],
+                        zoom: 17,
+                        pitch: 60,
+                        bearing: 0,
+                        speed: 0.5,
+                    });
+                });
             }
 
             function addMarker(location, label) {
@@ -380,11 +406,11 @@
                 } else {
                     nextStep = null;
                 }
-                NowLatLng = {
+                /*NowLatLng = {
                     lat: LatLngtoFloor(position.coords.latitude),
                     lng: LatLngtoFloor(position.coords.longitude),
                 };
-                console.log(NowLatLng);
+                console.log(NowLatLng);*/
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
@@ -393,8 +419,6 @@
                 }
                 if (moveDistance <= 5 && startTime == null) {
                     startTime = Date.now();
-                    idlePosition = NowLatLng;
-                    console.log("開始待機" + startTime);
                 } else if (moveDistance > 5 && startTime != null) {
                     endTime = Date.now();
                     console.log("結束待機" + endTime);
@@ -462,24 +486,17 @@
             }
 
             function startJourney() {
-                map.setPitch(80);
-                map.setZoom(18);
                 if (startTime == null) {
                     startTime = Date.now();
                     Timer += Math.floor((endTime - startTime) / 1000);
                     console.log("待機時間" + Timer + "秒");
-                    startTime = null;
                     endTime = null;
                 }
-                watchPositionId = navigator.geolocation.watchPosition(recordPosition, showError, {
-                    timeout: 2 * 1000,
-                    maximumAge: 0,
-                    enableHighAccuracy: true,
-                });
+                goState = true;
+                calcRoute(NowLatLng, arrivalLatLng);
             }
 
             function endJourney() {
-                navigator.geolocation.clearWatch(watchPositionId);
                 positionRecord.forEach((currentValue, index) => {
                     if (index > 0) {
                         const previousPoint = positionRecord[index - 1];
@@ -490,7 +507,8 @@
                         }
                     }
                 });
-                Timer = Math.floor(Timer / 60);
+                endTime = Date.now();
+                Timer = Math.floor((endTime-startTime) / 600);
                 console.log("結算中...");
                 final_time = Timer;
                 final_distance = totalMoveLength;
@@ -572,7 +590,7 @@
 
             async function calcRoute(origin, destination) {
                 const query = await fetch(
-                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};120.51972,23.03556.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
+                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
                     { method: 'GET' }
                 );
                 json = await query.json();
@@ -695,14 +713,6 @@
             window.initMap = initMap;
 
         </script>
-        <div class="row">
-            <div class="d-grid">
-                <button class="btn btn-danger btn-block" type="button" data-bs-toggle="modal" data-bs-target="#endModal"
-                    onclick="endJourney()">
-                    <i class="fa-solid fa-flag-checkered fa-lg"></i><b> 結束行程</b>
-                </button>
-            </div>
-        </div>
     </div>
 </body>
 
