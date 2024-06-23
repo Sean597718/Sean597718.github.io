@@ -43,6 +43,7 @@
             border: 2px solid #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
+
         .btn {
             margin-top: 6px;
             margin-bottom: 6px;
@@ -185,6 +186,10 @@
                 initMap();
             });
 
+            function log(message) {
+                console.log(`[${new Date().toISOString()}] ${message}`);
+            }
+
             function initMap() {
                 const initLatLng = [121.5173399, 25.0475613];
                 const mapOptions = {
@@ -264,6 +269,7 @@
 
                 function updateUserLocation(position) {
                     // 更新位置历史
+
                     positionRecord.push([position.lng, position.lat]);
 
                     // 更新地图上的标记或其他需要的位置更新操作
@@ -276,7 +282,7 @@
                             lat: LatLngtoFloor(position.lat),
                             lng: LatLngtoFloor(position.lng),
                         };
-                        if(goState == true){
+                        if (goState == true) {
                             recordPosition(NowLatLng);
                         }
                     } else {
@@ -285,24 +291,16 @@
                             lat: LatLngtoFloor(position.lat),
                             lng: LatLngtoFloor(position.lng),
                         };
-                        if(goState == true){
+                        if (goState == true) {
                             recordPosition(NowLatLng);
                         }
                     }
 
                     // 更新地图视图
-                    map.flyTo({
-                        center: position,
-                        zoom: 17,
-                        pitch: 80,
-                        bearing: 0,
-                        speed: 0.5,
-                    });
-
+                    map.setCenter(position);
+                    log(`Updating user location: ${JSON.stringify(position)}`);
                     // 这里可以添加其他需要根据位置更新的逻辑
                     // 例如更新路线、计算距离等
-
-                    console.log('位置更新: ', nowposition);
                 }
             }
 
@@ -428,7 +426,7 @@
                     }
                 });
                 if (cardTextFare) {
-                    let nowTimer = (Date.now()-startTime)/600;
+                    let nowTimer = (Date.now() - startTime) / 600;
                     cardTextFare.innerHTML =
                         "目前車資：" +
                         (50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20) +
@@ -448,27 +446,22 @@
                     let stepPolyline = new gomp.Polyline({
                         path: stepPath,
                     });
-                    if (booleanPointOnLine(NowLatLng, stepPolyline)) {
-                        if (currentStepIndex < stepsPath.length - 1) {
-                            currentStepIndex++;
-                            let distance = computeDistance(NowLatLng, nextStep.start_location);
-                            cardTextDistance.innerHTML = formatDistance(distance) + "後";
-                            cardTextInstruction.innerHTML = nextStep.maneuver.instruction;
-                        } else {
-                            cardTextDistance.innerHTML = formatDistance(distance) + "後";
-                            cardTextInstruction.innerHTML = currentStep.maneuver.instruction;
-                            endJourney();
-                            endModal.show();
-                            console.log("到達目的地");
-                        }
+                    if (currentStepIndex < stepsPath.length - 1) {
+                        currentStepIndex++;
+                        let distance = computeDistance(NowLatLng, nextStep.start_location);
+                        cardTextDistance.innerHTML = formatDistance(distance) + "後";
+                        cardTextInstruction.innerHTML = nextStep.maneuver.instruction;
+                        log("下一步：" + nextStep.maneuver.instruction);
                     } else {
                         cardTextDistance.innerHTML = formatDistance(distance) + "後";
                         cardTextInstruction.innerHTML = currentStep.maneuver.instruction;
+                        endJourney();
+                        log("最後一步：" + currentStep.maneuver.instruction);
                     }
                 } else {
                     calcRoute(NowLatLng, arrivalLatLng);
                     map.setCenter(NowLatLng);
-                    console.log("偏離路徑");
+                    log("重新計算路線");
                 }
             }
 
@@ -499,7 +492,7 @@
                     }
                 });
                 endTime = Date.now();
-                Timer = Math.floor((endTime-startTime) / 600);
+                Timer = Math.floor((endTime - startTime) / 600);
                 console.log("結算中...");
                 final_time = Timer;
                 final_distance = totalMoveLength;
@@ -601,7 +594,6 @@
                 // if the route already exists on the map, we'll reset it using setData
                 if (map.getSource('route')) {
                     map.getSource('route').setData(geojson);
-                    console.log(route);
                 }
                 // otherwise, we'll make a new request
                 else {
@@ -623,17 +615,17 @@
                         }
                     });
 
-                    stepsPath.forEach(step => {
+                    /*stepsPath.forEach(step => {
                         const marker = new gomp.Marker()
                             .setLngLat(step.maneuver.location)
                             .setPopup(new gomp.Popup({ offset: 25 }) // add popups
                                 .setHTML(`<h3>Type: ${step.maneuver.type}</h3><p>動作:${step.maneuver.modifier}</p><p>指示: ${step.name}</p>`))
                             .addTo(map);
-                    });
+                    });*/
 
                 };
 
-                countStepTypes(stepsPath);
+                //countStepTypes(stepsPath);
 
                 document.getElementById("prevButton").addEventListener("click", function () {
                     if (currentStepIndex > 0) {
@@ -676,10 +668,10 @@
                     }
                 });
 
-                console.log("各 type 的数量:");
+                /*console.log("各 type 的数量:");
                 for (const type in typeCounts) {
                     console.log(`${type}: ${typeCounts[type]}個`);
-                }
+                }*/
             }
 
             function updateInstruction() {
