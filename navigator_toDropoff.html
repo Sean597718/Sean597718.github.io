@@ -408,11 +408,6 @@
                 } else {
                     nextStep = null;
                 }
-                NowLatLng = {
-                    lat: LatLngtoFloor(position.coords.latitude),
-                    lng: LatLngtoFloor(position.coords.longitude),
-                };
-                
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
