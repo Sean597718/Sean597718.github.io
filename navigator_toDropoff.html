@@ -583,7 +583,7 @@
                 );
                 json = await query.json();
                 console.log(json);
-                const routeData = json.routes[0];
+                routeData = json.routes[0];
                 route = routeData.geometry.coordinates;
                 stepsPath = routeData.legs[0].steps;
                 console.log(stepsPath);
