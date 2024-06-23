@@ -165,8 +165,8 @@
             let totalMoveLength = 0; // 移動路徑的總長度
             let idlePosition = null; // 怠速開始位置
             let idleTimer = 0; // 計時器
-            let startIdletime = null; // 怠速起始時間
-            let endIdletime = null; // 怠速結束時間
+            let startTime = null; // 起始時間
+            let endTime = null; // 結束時間
             let nowposition = null; // 目前所在位置
             const cardTextDistance = document.querySelector("#card-distance");
             const cardTextInstruction = document.querySelector("#card-instruction");
@@ -176,11 +176,6 @@
             let fare = 0; // 車資
             const totalDistanceElement = document.getElementById("total-distance");
             const totalFareElement = document.getElementById("total-fare");
-            const APoptions = {
-                type: '地點',
-                key: gomp.accessToken,
-                location: [25.0475613, 121.5173399],
-            }; //autocomplete設定
 
             //初始化地圖
             let marker;
@@ -205,28 +200,73 @@
 
                 map = new gomp.Map(mapOptions);
                 map.addControl(new gomp.NavigationControl({ showZoom: false }));
-                map.addControl(new gomp.GeolocateControl({
+
+                // 创建GeolocateControl
+                const geolocateControl = new gomp.GeolocateControl({
                     positionOptions: {
                         enableHighAccuracy: true,
                     },
                     trackUserLocation: true,
-                }), 'bottom-right');
+                });
+
+                // 将GeolocateControl添加到地图
+                map.addControl(geolocateControl, 'bottom-right');
+
                 gompWebServiceJsClient = new GompWebServiceJsClient({ key: gomp.accessToken });
                 map8Route = new Map8Route({
                     gompWebServiceJsClient: gompWebServiceJsClient,
                 });
                 map.addControl(map8Route);
-                getPosition();
 
-                let positionHistory = [];
+                // 监听地图加载完成事件
+                map.on('load', function () {
+                    // 地图加载完成后自动触发geolocation
+                    geolocateControl.trigger();
 
-                geolocateControl.on('geolocate', (e) => {
-                    const { longitude, latitude } = e.coords;
-                    positionHistory.push([longitude, latitude]);
+                    // 监听位置更新事件
+                    geolocateControl.on('geolocate', function (e) {
+                        const lon = e.coords.longitude;
+                        const lat = e.coords.latitude;
+                        const position = {
+                            lat: lat,
+                            lng: lon
+                        };
 
-                    // 更新地圖上的標記或其他需要的位置更新操作
-                    showToast('位置紀錄: ', positionHistory);
+                        // 更新用户位置
+                        updateUserLocation(position);
+                    });
                 });
+
+                function updateUserLocation(position) {
+                    // 更新位置历史
+                    positionRecord.push([position.lng, position.lat]);
+
+                    // 更新地图上的标记或其他需要的位置更新操作
+                    if (nowposition == null) {
+                        nowposition = new gomp.Marker({
+                            position: position,
+                            map: map,
+                        });
+                        NowLatLng = {
+                            lat: LatLngtoFloor(position.lat),
+                            lng: LatLngtoFloor(position.lng),
+                        };
+                    } else {
+                        nowposition.setLngLat(position);
+                        NowLatLng = {
+                            lat: LatLngtoFloor(position.lat),
+                            lng: LatLngtoFloor(position.lng),
+                        };
+                    }
+
+                    // 更新地图视图
+                    map.setCenter(position);
+
+                    // 这里可以添加其他需要根据位置更新的逻辑
+                    // 例如更新路线、计算距离等
+
+                    console.log('位置更新: ', nowposition);
+                }
             }
 
             function addMarker(location, label) {
@@ -264,7 +304,13 @@
                     toastElement.remove();
                 }, duration);
             }
-
+            function computeHeading(start, end) {
+                const bearing = turf.bearing(
+                    turf.point([start.lng, start.lat]),
+                    turf.point([end.lng, end.lat])
+                );
+                return (bearing + 360) % 360; // 確保結果在 0-360 度範圍內
+            }
             function headingCorrection(heading) {
                 if (heading < 0) {
                     heading += 360;
@@ -282,20 +328,11 @@
                 }
             }
 
-            function computeDistance(latLng1, latLng2) {
-                const R = 6371000;
-                const lat1 = latLng1.lat;
-                const lon1 = latLng1.lng;
-                const lat2 = latLng2.lat;
-                const lon2 = latLng2.lng;
-                const dLat = deg2rad(lat2 - lat1);
-                const dLon = deg2rad(lon2 - lon1);
-                const a =
-                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                const distance = Math.floor(R * c);
-                return distance;
+            function computeDistance(point1, point2) {
+                const from = turf.point([point1.lng, point1.lat]);
+                const to = turf.point([point2.lng, point2.lat]);
+                const distance = turf.distance(from, to, { units: 'meters' });
+                return Math.floor(distance);
             }
 
             function deg2rad(deg) {
@@ -307,7 +344,6 @@
                 let truncatedNumber = Math.floor(number * factor) / factor;
                 return truncatedNumber;
             }
-
             function recordPosition(position) {
                 let currentStep = routeData.legs[0].steps[currentStepIndex];
                 if (currentStepIndex < routeData.legs[0].steps.length - 1) {
@@ -319,24 +355,24 @@
                     lat: LatLngtoFloor(position.coords.latitude),
                     lng: LatLngtoFloor(position.coords.longitude),
                 };
-                showToast(NowLatLng);
+                console.log(NowLatLng);
                 if (positionRecord[positionRecord.length - 1]) {
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
                 if (positionRecord[positionRecord.length - 1] !== NowLatLng) {
                     positionRecord.push(NowLatLng);
                 }
-                if (moveDistance <= 5 && startIdletime == null) {
-                    startIdletime = Date.now();
+                if (moveDistance <= 5 && startTime == null) {
+                    startTime = Date.now();
                     idlePosition = NowLatLng;
-                    showToast("開始待機" + startIdletime);
-                } else if (moveDistance > 5 && startIdletime != null) {
-                    endIdletime = Date.now();
-                    showToast("結束待機" + endIdletime);
-                    idleTimer += Math.floor((endIdletime - startIdletime) / 1000);
-                    showToast("待機時間" + idleTimer + "秒");
-                    startIdletime = null;
-                    endIdletime = null;
+                    console.log("開始待機" + startTime);
+                } else if (moveDistance > 5 && startTime != null) {
+                    endTime = Date.now();
+                    console.log("結束待機" + endTime);
+                    idleTimer += Math.floor((endTime - startTime) / 1000);
+                    console.log("待機時間" + idleTimer + "秒");
+                    startTime = null;
+                    endTime = null;
                 }
                 positionRecord.forEach((currentValue, index) => {
                     if (index > 0) {
@@ -354,9 +390,8 @@
                         (50 + Math.floor(idleTimer / 60) * 2 + estimatedDistance * 20) +
                         "元";
                 }
-                let heading = headingCorrection(
-                    computeHeading(NowLatLng, findNextPointsToCurrentLocationTest(NowLatLng, routeData.geometry.coordinates.map((coord) => ({ lat: coord[1], lng: coord[0] }))))
-                );
+                let heading =
+                    computeHeading(NowLatLng, findNextPointsToCurrentLocationTest(NowLatLng, routeData.geometry.coordinates.map((coord) => ({ lat: coord[1], lng: coord[0] }))));
                 let distance = computeDistance(NowLatLng, currentStep.start_location);
                 nowposition.setLngLat(NowLatLng);
                 map.setBearing(heading);
@@ -364,12 +399,12 @@
                 map.setZoom(17);
                 map.setPitch(80);
 
-                if (isLocationOnEdge(NowLatLng, Pathpolyline, 0.0003)) {
+                if (booleanPointOnLine(NowLatLng, Pathpolyline)) {
                     let stepPath = decodePath(stepsPath[currentStepIndex]);
                     let stepPolyline = new gomp.Polyline({
                         path: stepPath,
                     });
-                    if (isLocationOnEdge(NowLatLng, stepPolyline, 0.0003)) {
+                    if (booleanPointOnLine(NowLatLng, stepPolyline)) {
                         if (currentStepIndex < stepsPath.length - 1) {
                             currentStepIndex++;
                             let distance = computeDistance(NowLatLng, nextStep.start_location);
@@ -380,7 +415,7 @@
                             cardTextInstruction.innerHTML = currentStep.maneuver.instruction;
                             endJourney();
                             endModal.show();
-                            showToast("到達目的地");
+                            console.log("到達目的地");
                         }
                     } else {
                         cardTextDistance.innerHTML = formatDistance(distance) + "後";
@@ -389,23 +424,23 @@
                 } else {
                     calcRoute(NowLatLng, arrivalLatLng);
                     map.setCenter(NowLatLng);
-                    showToast("偏離路徑");
+                    console.log("偏離路徑");
                 }
             }
 
             function showError(error) {
-                showToast("Error getting location: " + error.message);
+                console.log("Error getting location: " + error.message);
             }
 
             function startJourney() {
                 map.setPitch(80);
                 map.setZoom(18);
-                if (startIdletime != null) {
-                    endIdletime = Date.now();
-                    idleTimer += Math.floor((endIdletime - startIdletime) / 1000);
-                    showToast("待機時間" + idleTimer + "秒");
-                    startIdletime = null;
-                    endIdletime = null;
+                if (startTime != null) {
+                    endTime = Date.now();
+                    idleTimer += Math.floor((endTime - startTime) / 1000);
+                    console.log("待機時間" + idleTimer + "秒");
+                    startTime = null;
+                    endTime = null;
                 }
                 watchPositionId = navigator.geolocation.watchPosition(recordPosition, showError, {
                     timeout: 2 * 1000,
@@ -427,7 +462,7 @@
                     }
                 });
                 idleTimer = Math.floor(idleTimer / 60);
-                showToast("結算中...");
+                console.log("結算中...");
                 final_time = idleTimer;
                 final_distance = totalMoveLength;
 
@@ -439,7 +474,7 @@
                     }
                     totalFareElement.innerText = final_fare + " 元";
                 }
-               
+
             }
 
             function findNextPointsToCurrentLocationTest(currentLocation, overviewPath) {
@@ -448,15 +483,15 @@
                 for (let i = coordinates.length - 1; i >= 0; i -= 1) {
                     let startPoint = coordinates[i];
                     let endPoint = coordinates[i - 1];
-                    showToast(startPoint.lat + "," + startPoint.lng + " index :" + i);
-                    showToast(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
+                    console.log(startPoint.lat + "," + startPoint.lng + " index :" + i);
+                    console.log(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
                     const polyline = new gomp.Polyline({
                         path: [startPoint, endPoint],
                         geodesic: true,
                     });
-                    if (isLocationOnEdge(currentPoint, polyline, 0.0003)) {
+                    if (booleanPointOnLine(currentPoint, polyline, 0.0003)) {
                         addMarker(startPoint, "T");
-                        showToast(startPoint.lat + "," + startPoint.lng);
+                        console.log(startPoint.lat + "," + startPoint.lng);
                         return startPoint;
                     } else {
                         continue;
@@ -513,15 +548,15 @@
 
             async function calcRoute(origin, destination) {
                 const query = await fetch(
-                    `https://api.map8.zone/route/bicycle/121.564427,25.033671;120.51972,23.03556.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
+                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};120.51972,23.03556.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
                     { method: 'GET' }
                 );
                 json = await query.json();
-                showToast(json);
-                const routeData = json.routes[1];
+                console.log(json);
+                const routeData = json.routes[0];
                 route = routeData.geometry.coordinates;
-                const steps = routeData.legs[0].steps;
-                showToast(routeData);
+                stepsPath = routeData.legs[0].steps;
+                console.log(stepsPath);
                 const geojson = {
                     type: 'Feature',
                     properties: {},
@@ -533,7 +568,7 @@
                 // if the route already exists on the map, we'll reset it using setData
                 if (map.getSource('route')) {
                     map.getSource('route').setData(geojson);
-                    showToast(route);
+                    console.log(route);
                 }
                 // otherwise, we'll make a new request
                 else {
@@ -555,7 +590,7 @@
                         }
                     });
 
-                    steps.forEach(step => {
+                    stepsPath.forEach(step => {
                         const marker = new gomp.Marker()
                             .setLngLat(step.maneuver.location)
                             .setPopup(new gomp.Popup({ offset: 25 }) // add popups
@@ -565,11 +600,7 @@
 
                 };
 
-                countStepTypes(steps);
-                function updateInstruction() {
-                    document.getElementById("card-distance").innerText = formatDistance(Math.floor(steps[currentStepIndex].distance));
-                    document.getElementById("card-instruction").innerText = translateInstruction(steps[currentStepIndex].maneuver.modifier) + '進入' + data.legs[0].steps[currentStepIndex].name;
-                }
+                countStepTypes(stepsPath);
 
                 document.getElementById("prevButton").addEventListener("click", function () {
                     if (currentStepIndex > 0) {
@@ -579,7 +610,7 @@
                 });
 
                 document.getElementById("nextButton").addEventListener("click", function () {
-                    if (currentStepIndex < steps.length - 1) {
+                    if (currentStepIndex < stepsPath.length - 1) {
                         currentStepIndex++;
                         updateInstruction();
                     }
@@ -612,15 +643,15 @@
                     }
                 });
 
-                showToast("各 type 的数量:");
+                console.log("各 type 的数量:");
                 for (const type in typeCounts) {
-                    showToast(`${type}: ${typeCounts[type]}個`);
+                    console.log(`${type}: ${typeCounts[type]}個`);
                 }
             }
 
             function updateInstruction() {
-                document.getElementById("card-distance").innerText = formatDistance(Math.floor(steps[currentStepIndex].distance));
-                document.getElementById("card-instruction").innerText = translateInstruction(steps[currentStepIndex].maneuver.modifier) + '進入' + data.legs[0].steps[currentStepIndex].name;
+                document.getElementById("card-distance").innerText = formatDistance(Math.floor(stepsPath[currentStepIndex].distance));
+                document.getElementById("card-instruction").innerText = translateInstruction(stepsPath[currentStepIndex].maneuver.modifier) + '進入' + stepsPath[currentStepIndex].name;
             }
 
             document.getElementById("prevButton").addEventListener("click", function () {
@@ -631,7 +662,7 @@
             });
 
             document.getElementById("nextButton").addEventListener("click", function () {
-                if (currentStepIndex < steps.length - 1) {
+                if (currentStepIndex < stepsPath.length - 1) {
                     currentStepIndex++;
                     updateInstruction();
                 }
