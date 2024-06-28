@@ -384,8 +384,8 @@
             }
 
             function computeDistance(point1, point2) {
-                console.log("from"+ point1)
-                console.log("to"+ point2)
+                console.log(point1)
+                console.log(point2)
                 const from = turf.point([point1.lng, point1.lat]);
                 const to = turf.point([point2.lng, point2.lat]);
                 const distance = turf.distance(from, to, { units: 'meters' });
@@ -409,11 +409,11 @@
                 } else {
                     nextStep = null;
                 }
-                /*NowLatLng = {
+                NowLatLng = {
                     lat: LatLngtoFloor(position.coords.latitude),
                     lng: LatLngtoFloor(position.coords.longitude),
                 };
-                console.log(NowLatLng);*/
+                console.log(NowLatLng);
                 if (positionRecord[positionRecord.length - 1]) {
                     console.log("NowLatLng"+ NowLatLng + "Latest Record" +positionRecord[positionRecord.length - 1] )
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
