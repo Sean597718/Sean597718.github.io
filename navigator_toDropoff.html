@@ -270,7 +270,7 @@
                 function updateUserLocation(position) {
                     // 更新位置历史
 
-                    positionRecord.push([position.lng, position.lat]);
+                    positionRecord.push({lng: position.lng, lat: position.lat});
 
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (nowposition == null) {
