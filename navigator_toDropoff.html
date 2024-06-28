@@ -384,9 +384,10 @@
             }
 
             function computeDistance(point1, point2) {
+                console.log("from"+ point1)
+                console.log("to"+ point2)
                 const from = turf.point([point1.lng, point1.lat]);
                 const to = turf.point([point2.lng, point2.lat]);
-                console.log("from"+ from)
                 const distance = turf.distance(from, to, { units: 'meters' });
                 return Math.floor(distance);
             }
@@ -479,7 +480,6 @@
                 if (startTime == null) {
                     startTime = Date.now();
                     Timer += Math.floor((endTime - startTime) / 1000);
-                    console.log("待機時間" + Timer + "秒");
                     endTime = null;
                 }
                 goState = true;
