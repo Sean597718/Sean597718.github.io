@@ -436,6 +436,19 @@
                         (50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20) +
                         "元";
                 }
+                const coordinatesPairs = routeData.geometry.coordinates.map((coord, index, array) => {
+                  if (index < array.length - 1) {
+                    return {
+                      current: { lat: coord[1], lng: coord[0] },
+                      next: { lat: array[index + 1][1], lng: array[index + 1][0] }
+                    };
+                  } else {
+                    return null;
+                  }
+                }).filter(pair => pair !== null);
+                
+                console.log(coordinatesPairs);
+
                 let heading =
                     computeHeading(NowLatLng, findNextPointsToCurrentLocationTest(NowLatLng, routeData.geometry.coordinates.map((coord) => ({ lat: coord[1], lng: coord[0] }))));
                 let distance = computeDistance(NowLatLng, currentStep.start_location);
