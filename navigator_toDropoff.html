@@ -87,8 +87,7 @@
                         <p>目的地: <span id="destination"></span></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
-                            onclick="startJourney()">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="startJourney()">
                             <i class="bi bi-arrow-90deg-right"></i> 出發</button>
                         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle-fill"></i> 關閉</button>
@@ -275,30 +274,33 @@
 
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (nowposition == null) {
+                        console.log(goState)
                         nowposition = new gomp.Marker({
                             position: position,
                             map: map,
                         });
                         NowLatLng = {
-                            1: LatLngtoFloor(position.lat),
-                            0: LatLngtoFloor(position.lng),
+                            lat: LatLngtoFloor(position.lat),
+                            lng: LatLngtoFloor(position.lng),
                         };
                         if (goState == true) {
+                            console.log("執行記錄位置")
                             recordPosition(NowLatLng);
                         }
                     } else {
                         nowposition.setLngLat(position);
                         NowLatLng = {
-                            1: LatLngtoFloor(position.lat),
-                            0: LatLngtoFloor(position.lng),
+                            lat: LatLngtoFloor(position.lat),
+                            lng: LatLngtoFloor(position.lng),
                         };
                         if (goState == true) {
                             recordPosition(NowLatLng);
                         }
                     }
+                    console.log(goState)
                     // 更新地图视图
                     map.setCenter(position);
-                    
+
                     // 这里可以添加其他需要根据位置更新的逻辑
                     // 例如更新路线、计算距离等
                 }
@@ -382,8 +384,8 @@
             }
 
             function computeDistance(point1, point2) {
-                const from = turf.point([point1[0], point1[1]]);
-                const to = turf.point([point2[0], point2[1]]);
+                const from = turf.point([point1.lng, point1.lat]);
+                const to = turf.point([point2.lng, point2.lat]);
                 const distance = turf.distance(from, to, { units: 'meters' });
                 return Math.floor(distance);
             }
@@ -398,15 +400,19 @@
                 return truncatedNumber;
             }
             function recordPosition(position) {
+                console.log("開始記錄位置");
                 let currentStep = routeData.legs[0].steps[currentStepIndex];
                 if (currentStepIndex < routeData.legs[0].steps.length - 1) {
                     nextStep = routeData.legs[0].steps[currentStepIndex + 1];
                 } else {
                     nextStep = null;
                 }
+                /*NowLatLng = {
+                    lat: LatLngtoFloor(position.coords.latitude),
+                    lng: LatLngtoFloor(position.coords.longitude),
+                };
+                console.log(NowLatLng);*/
                 if (positionRecord[positionRecord.length - 1]) {
-                    console.log(positionRecord[positionRecord.length - 1])
-                    console.log(NowLatLng)
                     moveDistance = computeDistance(positionRecord[positionRecord.length - 1], NowLatLng);
                 }
                 if (positionRecord[positionRecord.length - 1] !== NowLatLng && moveDistance > 5) {
@@ -439,10 +445,11 @@
                 map.setPitch(80);
 
                 if (booleanPointOnLine(NowLatLng, Pathpolyline)) {
-                    let stepPath = decodePath(stepsPath[currentStepIndex]);
-                    let stepPolyline = new gomp.Polyline({
-                        path: stepPath,
-                    });
+                    let stepPath = routeData[currentStepIndex].geometry.coordinates;
+                    let stepPolyline = turf.lineString([
+                        [stepPath[0][0], stepPath[0][1]],
+                        [stepPath[1][0], stepPath[1][1]],
+                    ]);
                     if (currentStepIndex < stepsPath.length - 1) {
                         currentStepIndex++;
                         let distance = computeDistance(NowLatLng, nextStep.start_location);
@@ -474,7 +481,7 @@
                     endTime = null;
                 }
                 goState = true;
-                
+
                 calcRoute(NowLatLng, arrivalLatLng);
             }
 
@@ -512,16 +519,14 @@
                 for (let i = coordinates.length - 1; i >= 0; i -= 1) {
                     let startPoint = coordinates[i];
                     let endPoint = coordinates[i - 1];
-                    console.log(startPoint.lat + "," + startPoint.lng + " index :" + i);
-                    console.log(endPoint.lat + "," + endPoint.lng + " index :" + (i - 1));
-                    let polyline = new gomp.Polyline({
-                        path: [startPoint, endPoint],
-                        geodesic: true,
-                    });
-                    if (booleanPointOnLine(currentPoint, polyline, 0.0003)) {
-                        addMarker(startPoint, "T");
-                        console.log(startPoint.lat + "," + startPoint.lng);
-                        return startPoint;
+                    let lineString = turf.lineString([
+                        [startPoint.lng, startPoint.lat],
+                        [endPoint.lng, endPoint.lat]
+                    ]);
+                    if (booleanPointOnLine(currentPoint, lineString)) {
+                        addMarker(endPoint, "O");
+                        console.log(endPoint.lat + "," + endPoint.lng);
+                        return endPoint;
                     } else {
                         continue;
                     }
@@ -572,13 +577,15 @@
 
             async function calcRoute(origin, destination) {
                 const query = await fetch(
-                    `https://api.map8.zone/route/car/${NowLatLng[0]},${NowLatLng[1]};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
+                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
                     { method: 'GET' }
                 );
                 json = await query.json();
+                console.log(json);
                 routeData = json.routes[0];
                 route = routeData.geometry.coordinates;
                 stepsPath = routeData.legs[0].steps;
+                console.log(stepsPath);
                 const geojson = {
                     type: 'Feature',
                     properties: {},
