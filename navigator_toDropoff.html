@@ -104,10 +104,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <b>請確認是否已抵達乘客上車點</b></br>
-                        <b>送出後將傳送訊息告知乘客！</b></br>
-                        <span id="total-distance" style="color:blue">
-                        <span id="total-fare" style="color:blue">
+                        <b>請確認是否已抵達乘客上車點</b>
+                        <b>送出後將傳送訊息告知乘客！</b>
+                        <p>總距離: <span id="total-distance" style="color:blue"></span> 公里</p>
+                        <p>總費用: <span id="total-fare" style="color:blue"></span> 元</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-bs-dismiss="modal">
@@ -450,7 +450,7 @@
                 console.log(coordinatesPairs);
 
                 let heading =
-                    computeHeading(NowLatLng, findNextPointsToCurrentLocationTest(NowLatLng, routeData.geometry.coordinates.map((coord) => ({ lat: coord[1], lng: coord[0] }))));
+                    computeHeading(NowLatLng, findNextPointsToCurrentLocationTest(NowLatLng,coordinatesPairs));
                 let distance = computeDistance(NowLatLng, currentStep.start_location);
                 nowposition.setLngLat(NowLatLng);
                 map.setBearing(heading);
@@ -530,8 +530,8 @@
                 const coordinates = overviewPath;
                 const currentPoint = currentLocation;
                 for (let i = coordinates.length - 1; i >= 0; i -= 1) {
-                    let startPoint = coordinates[i];
-                    let endPoint = coordinates[i - 1];
+                    let startPoint = coordinates[i].current;
+                    let endPoint = coordinates[i].next;
                     let lineString = turf.lineString([
                         [startPoint.lng, startPoint.lat],
                         [endPoint.lng, endPoint.lat]
