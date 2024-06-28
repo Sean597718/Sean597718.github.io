@@ -445,7 +445,7 @@
                 map.setZoom(17);
                 map.setPitch(80);
 
-                if (turf.booleanPointOnLine(NowLatLng, Pathpolyline)) {
+                if (turf.booleanPointOnLine([NowLatLng.lng,NowLatLng.lat], Pathpolyline)) {
                     let stepPath = routeData[currentStepIndex].geometry.coordinates;
                     let stepPolyline = turf.lineString([
                         [stepPath[0][0], stepPath[0][1]],
@@ -523,7 +523,7 @@
                         [startPoint.lng, startPoint.lat],
                         [endPoint.lng, endPoint.lat]
                     ]);
-                    if (turf.booleanPointOnLine(currentPoint, lineString)) {
+                    if (turf.booleanPointOnLine([currentPoint.lng,currentPoint.lat], lineString)) {
                         addMarker(endPoint, "O");
                         console.log(endPoint.lat + "," + endPoint.lng);
                         return endPoint;
