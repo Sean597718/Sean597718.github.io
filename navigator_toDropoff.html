@@ -564,6 +564,7 @@
                 route = routeData.geometry.coordinates;
                 stepsPath = routeData.legs[0].steps;
                 console.log(stepsPath);
+                nextPoint = {lng: stepsPath[1].maneuver.location[0],lat: stepsPath[1].maneuver.location[1]};
                 const geojson = {
                     type: 'Feature',
                     properties: {},
