@@ -237,6 +237,10 @@
                 });
 
                 function handleGeolocate(e) {
+                    if (typeof e.coords.latitude !== 'number' || typeof e.coords.longitude !== 'number') {
+                        console.error('Invalid geolocation data:', e.coords);
+                        return;
+                    }
                     const position = {
                         lat: e.coords.latitude,
                         lng: e.coords.longitude
@@ -263,12 +267,17 @@
 
                 function updateUserLocation(position) {
                     // 更新位置历史
+                    if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+                        console.error('Invalid position:', position);
+                        return;
+                    }
                     const roundedPosition = {
-                        lng: LatLngtoFloor(position.lng),lat: LatLngtoFloor(position.lat)
+                        lat: LatLngtoFloor(position.lat),
+                        lng: LatLngtoFloor(position.lng)
                     };
-                    
                     NowLatLng = roundedPosition;
                     positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
+                    console.log("最新一筆位置紀錄", positionRecord[positionRecord.length - 1]);
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (!nowposition) {
                         nowposition = new gomp.Marker({
@@ -278,13 +287,12 @@
                     } else {
                         nowposition.setLngLat(roundedPosition);
                     }
-                    if (routeData) {
+                }
+
+
+                if (goState) {
                     recordPosition(NowLatLng);
                 }
-                }
-
-
-                
                 // 这里可以添加其他需要根据位置更新的逻辑
                 // 例如更新路线、计算距离等
             }
@@ -414,6 +422,11 @@
             }
 
             function computeDistance(point1, point2) {
+                if (!point1 || !point2 || typeof point1.lng !== 'number' || typeof point1.lat !== 'number' ||
+                    typeof point2.lng !== 'number' || typeof point2.lat !== 'number') {
+                    console.error('Invalid coordinates:', point1, point2);
+                    return 0; // 返回 0 而不是拋出錯誤，以避免中斷執行
+                }
                 const from = turf.point([point1.lng, point1.lat]);
                 const to = turf.point([point2.lng, point2.lat]);
                 const distance = turf.distance(from, to, { units: 'meters' });
@@ -431,11 +444,19 @@
             }
             // 更新目前行駛距離
             function updateEstimatedDistance() {
-                console.log("更新目前行駛距離");
                 estimatedDistance = positionRecord.reduce((total, currentValue, index, array) => {
                     if (index > 0) {
                         const previousPoint = array[index - 1];
-                        return total + computeDistance(previousPoint, currentValue);
+                        if (Array.isArray(previousPoint) && Array.isArray(currentValue) &&
+                            previousPoint.length === 2 && currentValue.length === 2) {
+                            return total + computeDistance(
+                                { lng: previousPoint[0], lat: previousPoint[1] },
+                                { lng: currentValue[0], lat: currentValue[1] }
+                            );
+                        } else {
+                            console.error('Invalid position record:', previousPoint, currentValue);
+                            return total;
+                        }
                     }
                     return total;
                 }, 0);
