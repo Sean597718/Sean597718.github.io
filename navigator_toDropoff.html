@@ -300,7 +300,10 @@
                     const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
                     const testPoint= turf.point([121.55999,25.05853])
                     // 创建当前路段的lineString
-                    const segment = turf.lineString([start, end]);
+                    const segment = turf.lineString([
+                                                        [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
+                                                        [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
+                                                    ]);
                     console.log(segment)
                     console.log(currentPoint)
                     // 检查当前位置是否在这个路段上
