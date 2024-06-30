@@ -306,7 +306,7 @@
                     // 检查当前位置是否在这个路段上
                     if (turf.booleanPointOnLine(currentPoint, segment)) {
                         // 如果在路段上，计算到下一个转弯点的距离
-                        const distanceToNextTurn = turf.distance(currentPoint, point(end), { units: 'meters' });
+                        const distanceToNextTurn = turf.distance(currentPoint, end, { units: 'meters' });
                         nextPoint = end;
                         // 更新导航信息
                         updateNavigationInfo(stepsPath[i + 1], distanceToNextTurn);
