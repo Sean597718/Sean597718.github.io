@@ -172,6 +172,7 @@
             const cardTextFare = document.querySelector("#card-fare");
             let routeData; // 路線資料
             let watchPositionId; // 監聽位置的 ID
+            let base_fare = 50; // 基本車資
             let fare = 0; // 車資
             const totalDistanceElement = document.getElementById("total-distance");
             const totalFareElement = document.getElementById("total-fare");
@@ -284,11 +285,12 @@
                     }
                 }
 
+
                 if (goState) {
                     recordPosition(NowLatLng);
                 }
 
-                map.setCenter(roundedPosition);
+                map.setCenter(NowLatLng);
 
                 // 这里可以添加其他需要根据位置更新的逻辑
                 // 例如更新路线、计算距离等
@@ -306,7 +308,7 @@
                     const segment = turf.lineString([start, end]);
 
                     // 检查当前位置是否在这个路段上
-                    if (booleanPointOnLine(currentPoint, segment)) {
+                    if (turf.booleanPointOnLine(currentPoint, segment)) {
                         // 如果在路段上，计算到下一个转弯点的距离
                         const distanceToNextTurn = turf.distance(currentPoint, point(end), { units: 'meters' });
                         nextPoint = end;
@@ -658,7 +660,6 @@
                 }
             });
 
-            window.initMap = initMap;
 
         </script>
     </div>
