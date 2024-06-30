@@ -293,13 +293,13 @@
                 }
             }
 
-            function checkPositionOnRoute(position) {
+            function checkPositionOnRoute(position,routes) {
                 const currentPoint = turf.point([position.lng, position.lat]);
-
+                const routes = routes;
                 // 遍历所有路段
-                for (let i = 0; i < stepsPath.length - 1; i++) {
-                    const start = turf.point([stepsPath[i].maneuver.location[0], stepsPath[i].maneuver.location[1]]);
-                    const end = turf.point([stepsPath[i + 1].maneuver.location[0], stepsPath[i + 1].maneuver.location[1]]);
+                for (let i = 0; i < routes.length - 1; i++) {
+                    const start = turf.point([routes[i].maneuver.location[0], routes[i].maneuver.location[1]]);
+                    const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
 
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
@@ -328,7 +328,7 @@
 
             function handlePositionUpdate(position) {
                 console.log("處理位置更新");
-                const isOnRoute = checkPositionOnRoute(position, routeData.legs[0].steps);
+                const isOnRoute = checkPositionOnRoute(position, stepsPath);
 
                 if (isOnRoute) {
                     // 在路线上，继续当前导航
