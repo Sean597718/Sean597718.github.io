@@ -410,11 +410,11 @@
             }
 
             function formatDistance(distance) {
-                if (distance >= 1000) {
-                    const kilometers = (distance / 1000).toFixed(1);
+                if (distance > 1) {
+                    const kilometers = distance.toFixed(1);
                     return kilometers + " 公里後";
                 } else {
-                    const meters = Math.round(distance / 10) * 10;;
+                    const meters = Math.round(distance*10) * 10;;
                     return meters + " 公尺後";
                 }
             }
