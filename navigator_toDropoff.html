@@ -295,7 +295,6 @@
 
             function checkPositionOnRoute(position,routes) {
                 const currentPoint = turf.point([position.lng, position.lat]);
-                const routes = routes;
                 // 遍历所有路段
                 for (let i = 0; i < routes.length - 1; i++) {
                     const start = turf.point([routes[i].maneuver.location[0], routes[i].maneuver.location[1]]);
