@@ -313,8 +313,11 @@
 
                         return true; // 表示在路线上
                     }
+                    else{
+                        console.log(turf.pointToLineDistance(currentPoint, segment, { units: "meters" }))
+                    }
                 }
-
+                
                 // 如果遍历完所有路段都没找到，说明不在路线上
                 return false;
             }
