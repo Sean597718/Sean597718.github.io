@@ -268,8 +268,7 @@
                 function updateUserLocation(position) {
                     // 更新位置历史
                     const roundedPosition = {
-                        lat: LatLngtoFloor(position.lat),
-                        lng: LatLngtoFloor(position.lng)
+                        lng: LatLngtoFloor(position.lng),lat: LatLngtoFloor(position.lat)
                     };
                     NowLatLng = roundedPosition;
                     positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
