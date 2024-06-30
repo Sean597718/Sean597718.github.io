@@ -293,7 +293,8 @@
             }
 
             function checkPositionOnRoute(position,routes) {
-                const currentPoint = {lng: position.lng, lat: position.lat};
+                //const currentPoint = {lng: position.lng, lat: position.lat};
+                const currentPoint = turf.point([currentPoint.lng,currentPoint.lat])
                 // 遍历所有路段
                 for (let i = 0; i < routes.length - 1; i++) {
                     const start = {lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1]};
@@ -304,7 +305,7 @@
                                                         [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
                                                     ]);
                     // 检查当前位置是否在这个路段上
-                    if (turf.pointToLineDistance(turf.point([currentPoint.lng,currentPoint.lat]), segment)<0.03) {
+                    if (turf.pointToLineDistance(currentPoint, segment)<0.03) {
                         // 如果在路段上，计算到下一个转弯点的距离
                         const distanceToNextTurn = turf.distance(currentPoint, end);
                         nextPoint = end;
