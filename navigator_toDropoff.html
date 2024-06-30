@@ -298,6 +298,7 @@
                 for (let i = 0; i < routes.length - 1; i++) {
                     const start = turf.point([routes[i].maneuver.location[0], routes[i].maneuver.location[1]]);
                     const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
+                    const testPoint= turf.point([121.55999,25.05853])
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
                     console.log(segment)
@@ -313,7 +314,7 @@
                         return true; // 表示在路线上
                     }
                     else{
-                        console.log(turf.pointToLineDistance(currentPoint, segment))
+                        console.log(turf.pointToLineDistance(testPoint, segment))
                     }
                 }
                 
