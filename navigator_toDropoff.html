@@ -299,7 +299,7 @@
                 for (let i = 0; i < routes.length - 1; i++) {
                     const start = turf.point([routes[i].maneuver.location[0], routes[i].maneuver.location[1]]);
                     const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
-
+                    console.log(end)
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
 
