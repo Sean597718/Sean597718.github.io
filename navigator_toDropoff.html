@@ -314,9 +314,10 @@
                         return true; // 表示在路线上
                     }
                     else{
-                        return false;
+                        continue
                     }
                 }
+                return false;
             }
             function updateNavigationInfo(nextStep, distance) {
                 if (cardTextDistance && cardTextInstruction) {
