@@ -317,7 +317,7 @@
                         return true; // 表示在路线上
                     }
                     else{
-                        console.log(turf.pointToLineDistance(testPoint, segment))
+                        console.log(turf.pointToLineDistance(currentPoint, segment))
                     }
                 }
                 
@@ -501,8 +501,6 @@
             function startJourney() {
                 if (startTime == null) {
                     startTime = Date.now();
-                    Timer += Math.floor((endTime - startTime) / 1000);
-                    console.log("待機時間" + Timer + "秒");
                     endTime = null;
                 }
                 goState = true;
