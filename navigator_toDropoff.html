@@ -296,16 +296,13 @@
                 const currentPoint = turf.point([position.lng, position.lat]);
                 // 遍历所有路段
                 for (let i = 0; i < routes.length - 1; i++) {
-                    const start = turf.point([routes[i].maneuver.location[0], routes[i].maneuver.location[1]]);
-                    const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
-                    const testPoint= turf.point([121.55999,25.05853])
+                    const start = {lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1]};
+                    const end = {lng: routes[i+1].maneuver.location[0], lat: routes[i+1].maneuver.location[1]};
                     // 创建当前路段的lineString
                     const segment = turf.lineString([
                                                         [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
                                                         [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
                                                     ]);
-                    console.log(segment)
-                    console.log(currentPoint)
                     // 检查当前位置是否在这个路段上
                     if (turf.booleanPointOnLine(currentPoint, segment)) {
                         // 如果在路段上，计算到下一个转弯点的距离
@@ -326,6 +323,7 @@
             }
             function updateNavigationInfo(nextStep, distance) {
                 if (cardTextDistance && cardTextInstruction) {
+                    console.log("更新指標")
                     cardTextDistance.innerHTML = formatDistance(distance) + "後";
                     cardTextInstruction.innerHTML = translateInstruction(nextStep.maneuver.modifier) + '進入' + nextStep.name;
                 }
