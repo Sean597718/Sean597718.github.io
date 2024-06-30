@@ -277,7 +277,6 @@
                     };
                     NowLatLng = roundedPosition;
                     positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
-                    console.log("最新一筆位置紀錄", positionRecord[positionRecord.length - 1]);
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (!nowposition) {
                         nowposition = new gomp.Marker({
@@ -288,13 +287,14 @@
                         nowposition.setLngLat(roundedPosition);
                     }
                     if (goState) {
+                        console.log(NowLatLng)
                     recordPosition(NowLatLng);
                     }
                 }
             }
 
             function checkPositionOnRoute(position) {
-                const currentPoint = turf.point([currentPosition.lng, currentPosition.lat]);
+                const currentPoint = turf.point([position.lng, position.lat]);
 
                 // 遍历所有路段
                 for (let i = 0; i < routeSteps.length - 1; i++) {
