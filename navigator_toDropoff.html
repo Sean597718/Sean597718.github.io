@@ -312,7 +312,7 @@
                         return true; // 表示在路线上
                     }
                     else{
-                        console.log(turf.pointToLineDistance(currentPoint, segment))
+                        console.log(turf.pointToLineDistance(position, segment))
                     }
                 }
                 
@@ -465,6 +465,7 @@
                     let nowTimer = (Date.now() - startTime) / 600;
                     let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
                     cardTextFare.innerHTML = "目前車資：" + currentFare + "元";
+                    console.log(Math.floor(nowTimer)+"分鐘"+estimatedDistance+"公里")
                 }
             }
             // 更新鏡頭視角
