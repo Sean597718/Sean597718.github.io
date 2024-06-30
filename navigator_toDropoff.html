@@ -268,9 +268,7 @@
                     };
                     
                     NowLatLng = roundedPosition;
-                    console.log(NowLatLng)
                     positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
-                    console.log("最新一筆位置紀錄" + positionRecord[positionRecord.length - 1]);
                     // 更新地图上的标记或其他需要的位置更新操作
                     if (!nowposition) {
                         nowposition = new gomp.Marker({
@@ -280,12 +278,13 @@
                     } else {
                         nowposition.setLngLat(roundedPosition);
                     }
-                }
-
-
-                if (goState) {
+                    if (routeData) {
                     recordPosition(NowLatLng);
                 }
+                }
+
+
+                
                 // 这里可以添加其他需要根据位置更新的逻辑
                 // 例如更新路线、计算距离等
             }
