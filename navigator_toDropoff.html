@@ -324,6 +324,7 @@
             }
 
             function handlePositionUpdate(position) {
+                console.log("處理位置更新");
                 const isOnRoute = checkPositionOnRoute(position, routeData.legs[0].steps);
 
                 if (isOnRoute) {
@@ -431,6 +432,7 @@
             }
             // 更新目前行駛距離
             function updateEstimatedDistance() {
+                console.log("更新目前行駛距離");
                 estimatedDistance = positionRecord.reduce((total, currentValue, index, array) => {
                     if (index > 0) {
                         const previousPoint = array[index - 1];
@@ -442,6 +444,7 @@
             }
             // 更新車資
             function updateFare() {
+                console.log("更新車資");
                 if (cardTextFare) {
                     let nowTimer = (Date.now() - startTime) / 600;
                     let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
@@ -450,6 +453,7 @@
             }
             // 更新鏡頭視角
             function updateMapView(position) {
+                console.log("更新地圖視角");
                 let heading = computeHeading(position, nextPoint);
                 nowposition.setLngLat(position);
                 map.setBearing(heading);
@@ -458,6 +462,7 @@
                 map.setPitch(80);
             }
             function recordPosition(position) {
+                console.log("紀錄位置相關功能");
                 // 更新目前行駛距離與車資
                 updateEstimatedDistance();
                 updateFare();
