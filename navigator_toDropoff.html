@@ -300,7 +300,7 @@
                     const end = turf.point([routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]);
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
-
+                    console.log(segment)
                     // 检查当前位置是否在这个路段上
                     if (turf.booleanPointOnLine(currentPoint, segment)) {
                         // 如果在路段上，计算到下一个转弯点的距离
