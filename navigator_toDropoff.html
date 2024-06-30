@@ -297,9 +297,9 @@
                 const currentPoint = turf.point([position.lng, position.lat]);
 
                 // 遍历所有路段
-                for (let i = 0; i < routeSteps.length - 1; i++) {
-                    const start = turf.point([routeSteps[i].maneuver.location[0], routeSteps[i].maneuver.location[1]]);
-                    const end = turf.point([routeSteps[i + 1].maneuver.location[0], routeSteps[i + 1].maneuver.location[1]]);
+                for (let i = 0; i < stepsPath.length - 1; i++) {
+                    const start = turf.point([stepsPath[i].maneuver.location[0], stepsPath[i].maneuver.location[1]]);
+                    const end = turf.point([stepsPath[i + 1].maneuver.location[0], stepsPath[i + 1].maneuver.location[1]]);
 
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
@@ -310,7 +310,7 @@
                         const distanceToNextTurn = turf.distance(currentPoint, point(end), { units: 'meters' });
                         nextPoint = end;
                         // 更新导航信息
-                        updateNavigationInfo(routeSteps[i + 1], distanceToNextTurn);
+                        updateNavigationInfo(stepsPath[i + 1], distanceToNextTurn);
 
                         return true; // 表示在路线上
                     }
