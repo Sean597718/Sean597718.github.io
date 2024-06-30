@@ -323,7 +323,7 @@
             function updateNavigationInfo(nextStep, distance) {
                 if (cardTextDistance && cardTextInstruction) {
                     console.log("更新指標")
-                    cardTextDistance.innerHTML = formatDistance(distance) + "後";
+                    cardTextDistance.innerHTML = formatDistance(distance) +;
                     cardTextInstruction.innerHTML = translateInstruction(nextStep.maneuver.modifier) + '進入' + nextStep.name;
                 }
             }
@@ -414,7 +414,8 @@
                     const kilometers = distance.toFixed(1);
                     return kilometers + " 公里後";
                 } else {
-                    const meters = Math.round(distance*10) * 10;;
+                    let distanceM = distance*1000
+                    const meters = Math.round(distance/10) * 10;;
                     return meters + " 公尺後";
                 }
             }
