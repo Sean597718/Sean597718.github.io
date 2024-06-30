@@ -1,0 +1,84 @@
+< !DOCTYPE html >
+    <html>
+        <head>
+            <meta charset="utf-8" />
+            <title>初始化地圖 - Map8 Platform Documentation</title>
+            <link rel="stylesheet" href="https://api.map8.zone/css/gomp.css?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4" />
+            <style>
+                #map{
+                    height: 400px;
+                width: 100%;
+        }
+            </style>
+        </head>
+        <body>
+            <div id="map"></div>
+
+            <script type="text/javascript" src="https://api.map8.zone/maps/js/gomp.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
+            <script type="text/javascript">
+                gomp.accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4';
+                var map = new gomp.Map({
+                    container: 'map', // 地圖容器 ID
+                style: 'https://api.map8.zone/styles/go-life-maps-tw-style-std/style.json', // 地圖樣式檔案位置
+                maxBounds: [[105, 15], [138.45858, 33.4]], // 台灣地圖區域
+                center: [121.54885, 25.03625], // 初始中心座標，格式為 [lng, lat]
+                zoom: 16, // 初始 ZOOM LEVEL; [0-20, 0 為最小 (遠), 20 ;最大 (近)]
+                minZoom: 6, // 限制地圖可縮放之最小等級, 可省略, [0-19.99]
+                maxZoom: 19.99, // 限制地圖可縮放之最大等級, 可省略 [0-19.99]
+                pitch: 50, // 攝影機仰角, 可省略, [0-60]
+                bearing: 0, // 地圖角度, 可省略, [-180 ~ 180; 0 為正北朝上, 180 為正南朝上]
+                scrollZoom: false, // 關閉始scroll,始配合始map.scrollZoom.enable({around: 'center'});始可以改根據地圖中心縮放,始預設為根據鼠標位置縮放
+                attributionControl: false
+        }).addControl(new gomp.AttributionControl({
+                    compact: false
+        }));
+                map.addControl(new gomp.NavigationControl());
+        map.on('load', () => {
+    // 生成大量座標點（這裡生成10000個點作為示例）
+    const coordinates = [];
+                for (let i = 0; i < 10000; i++) {
+                    coordinates.push([
+                        Math.random() * 360 - 180,  // 經度範圍 -180 到 180
+                        Math.random() * 170 - 85    // 緯度範圍 -85 到 85
+                    ]);
+    }
+
+                // 添加資料源
+                map.addSource('route', {
+                    'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                'properties': { },
+                'geometry': {
+                    'type': 'LineString',
+                'coordinates': coordinates
+            }
+        }
+    });
+
+                // 添加圖層
+                map.addLayer({
+                    'id': 'route',
+                'type': 'line',
+                'source': 'route',
+                'layout': {
+                    'line-join': 'round',
+                'line-cap': 'round'
+        },
+                'paint': {
+                    'line-color': '#888',
+                'line-width': 2
+        }
+    });
+
+    // 調整地圖視圖以適應線段
+    const bounds = coordinates.reduce((bounds, coord) => {
+        return bounds.extend(coord);
+    }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+                map.fitBounds(bounds, {
+                    padding: 20
+    });
+            </script>
+        </body>
+    </html>
