@@ -301,6 +301,7 @@
                     // 创建当前路段的lineString
                     const segment = turf.lineString([start, end]);
                     console.log(segment)
+                    console.log(currentPoint)
                     // 检查当前位置是否在这个路段上
                     if (turf.booleanPointOnLine(currentPoint, segment)) {
                         // 如果在路段上，计算到下一个转弯点的距离
@@ -312,7 +313,7 @@
                         return true; // 表示在路线上
                     }
                     else{
-                        console.log(turf.pointToLineDistance(position, segment))
+                        console.log(turf.pointToLineDistance(currentPoint, segment))
                     }
                 }
                 
