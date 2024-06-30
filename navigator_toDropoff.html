@@ -187,10 +187,6 @@
                 initMap();
             });
 
-            function log(message) {
-                console.log(`[${new Date().toISOString()}] ${message}`);
-            }
-
             function initMap() {
                 const initLatLng = [121.5173399, 25.0475613];
                 const mapOptions = {
@@ -270,7 +266,9 @@
                     const roundedPosition = {
                         lng: LatLngtoFloor(position.lng),lat: LatLngtoFloor(position.lat)
                     };
+                    
                     NowLatLng = roundedPosition;
+                    console.log(NowLatLng)
                     positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
                     console.log("最新一筆位置紀錄" + positionRecord[positionRecord.length - 1]);
                     // 更新地图上的标记或其他需要的位置更新操作
