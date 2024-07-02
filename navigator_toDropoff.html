@@ -49,6 +49,14 @@
             margin-top: 6px;
             margin-bottom: 6px;
         }
+
+        .geolocate-locked::after {
+            content: "🔒";
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -174,6 +182,7 @@
             let watchPositionId; // 監聽位置的 ID
             let base_fare = 50; // 基本車資
             let fare = 0; // 車資
+            let isViewLocked = true; // 默認鎖定視角
             const totalDistanceElement = document.getElementById("total-distance");
             const totalFareElement = document.getElementById("total-fare");
 
@@ -216,7 +225,8 @@
 
                 // 将GeolocateControl添加到地图
                 map.addControl(geolocateControl, 'bottom-right');
-
+                // 將 GeolocateControl 添加到地圖後
+                geolocateControl._container.onclick = handleGeolocateClick;
                 gompWebServiceJsClient = new GompWebServiceJsClient({ key: gomp.accessToken });
                 map8Route = new Map8Route({
                     gompWebServiceJsClient: gompWebServiceJsClient,
@@ -235,6 +245,11 @@
                     startModal.show();
                     document.getElementById("destination").innerText = arrivalLatLng;
                 });
+                map.on('dragstart', function () {
+                    isViewLocked = false;
+                    updateGeolocateButtonState();
+                    showToast("視角已解鎖，可自由移動地圖");
+                });
 
                 function handleGeolocate(e) {
                     if (typeof e.coords.latitude !== 'number' || typeof e.coords.longitude !== 'number') {
@@ -248,22 +263,14 @@
                     updateUserLocation(position);
                 }
 
-                /*const logInfoToConsole = () => {
-                    const center = map.getCenter();
-                    const zoom = map.getZoom().toFixed(2);
-                    const bearing = map.getBearing().toFixed(2);
-                    const pitch = map.getPitch().toFixed(2);
-
-                    console.log(`中心點: (${center.lng.toFixed(5)}, ${center.lat.toFixed(5)})`);
-                    console.log(`縮放級別: ${zoom}`);
-                    console.log(`方位角: ${bearing}`);
-                    console.log(`俯仰角: ${pitch}`);
-                };
-
-                map.on('move', logInfoToConsole);
-                map.on('zoom', logInfoToConsole);
-                map.on('rotate', logInfoToConsole);
-                map.on('pitch', logInfoToConsole);*/
+                function updateGeolocateButtonState() {
+                    const geolocateButton = geolocateControl._container;
+                    if (isViewLocked) {
+                        geolocateButton.classList.add('geolocate-locked');
+                    } else {
+                        geolocateButton.classList.remove('geolocate-locked');
+                    }
+                }
 
                 function updateUserLocation(position) {
                     // 更新位置历史
@@ -287,34 +294,34 @@
                         nowposition.setLngLat(roundedPosition);
                     }
                     if (goState) {
-                    recordPosition(NowLatLng);
+                        recordPosition(NowLatLng);
                     }
                 }
             }
 
-            function checkPositionOnRoute(position,routes) {
+            function checkPositionOnRoute(position, routes) {
                 //const currentPoint = {lng: position.lng, lat: position.lat};
-                const currentPoint = turf.point([position.lng,position.lat])
+                const currentPoint = turf.point([position.lng, position.lat])
                 // 遍历所有路段
                 for (let i = 0; i < routes.length - 1; i++) {
-                    const start = {lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1]};
-                    const end = {lng: routes[i+1].maneuver.location[0], lat: routes[i+1].maneuver.location[1]};
+                    const start = { lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1] };
+                    const end = { lng: routes[i + 1].maneuver.location[0], lat: routes[i + 1].maneuver.location[1] };
                     // 创建当前路段的lineString
                     const segment = turf.lineString([
-                                                        [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
-                                                        [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
-                                                    ]);
+                        [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
+                        [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
+                    ]);
                     // 检查当前位置是否在这个路段上
-                    if (turf.pointToLineDistance(currentPoint, segment)<0.03) {
+                    if (turf.pointToLineDistance(currentPoint, segment) < 0.03) {
                         // 如果在路段上，计算到下一个转弯点的距离
-                        const distanceToNextTurn = turf.distance(currentPoint, turf.point([ end.lng , end.lat ]));
+                        const distanceToNextTurn = turf.distance(currentPoint, turf.point([end.lng, end.lat]));
                         nextPoint = end;
                         // 更新导航信息
                         updateNavigationInfo(stepsPath[i + 1], distanceToNextTurn);
 
                         return true; // 表示在路线上
                     }
-                    else{
+                    else {
                         continue
                     }
                 }
@@ -323,7 +330,7 @@
             function updateNavigationInfo(nextStep, distance) {
                 if (cardTextDistance && cardTextInstruction) {
                     console.log("更新指標")
-                    cardTextDistance.innerHTML = formatDistance(distance) +;
+                    cardTextDistance.innerHTML = formatDistance(distance);
                     cardTextInstruction.innerHTML = translateInstruction(nextStep.maneuver.modifier) + '進入' + nextStep.name;
                 }
             }
@@ -348,16 +355,10 @@
                 event.stopPropagation();
                 event.preventDefault();
 
-                // 獲取當前位置並執行 flyTo
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    map.flyTo({
-                        center: [position.coords.longitude, position.coords.latitude],
-                        zoom: 17,
-                        pitch: 60,
-                        bearing: 0,
-                        speed: 0.5,
-                    });
-                });
+                isViewLocked = true; // 重新鎖定視角
+                updateGeolocateButtonState();
+                showToast("視角已解鎖，可自由移動地圖");
+                geolocateControl.trigger(); // 觸發位置更新
             }
 
             function addMarker(location, label) {
@@ -414,8 +415,8 @@
                     const kilometers = distance.toFixed(1);
                     return kilometers + " 公里後";
                 } else {
-                    let distanceM = distance*1000
-                    const meters = Math.round(distance/10) * 10;;
+                    let distanceM = distance * 1000
+                    const meters = Math.round(distance / 10) * 10;;
                     return meters + " 公尺後";
                 }
             }
@@ -468,18 +469,26 @@
                     let nowTimer = (Date.now() - startTime) / 600;
                     let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
                     cardTextFare.innerHTML = "目前車資：" + currentFare + "元";
-                    console.log(Math.floor(nowTimer)+"分鐘"+estimatedDistance+"公里")
+                    console.log(Math.floor(nowTimer) + "分鐘" + estimatedDistance + "公里")
                 }
             }
             // 更新鏡頭視角
             function updateMapView(position) {
                 console.log("更新地圖視角");
-                let heading = computeHeading(position, nextPoint);
-                nowposition.setLngLat(position);
-                map.setBearing(heading);
-                map.setCenter(position);
-                map.setZoom(17);
-                map.setPitch(80);
+                if (isViewLocked) {
+                    let heading = computeHeading(position, nextPoint);
+                    nowposition.setLngLat(position);
+                    map.easeTo({
+                        center: position,
+                        zoom: 17,
+                        pitch: 80,
+                        bearing: heading,
+                        duration: 1000 // 添加過渡動畫，使移動更平滑
+                    });
+                } else {
+                    // 僅更新位置標記，不改變地圖視角
+                    nowposition.setLngLat(position);
+                }
             }
             function recordPosition(position) {
                 console.log("紀錄位置相關功能");
@@ -567,7 +576,7 @@
                 route = routeData.geometry.coordinates;
                 stepsPath = routeData.legs[0].steps;
                 console.log(stepsPath);
-                nextPoint = {lng: stepsPath[1].maneuver.location[0],lat: stepsPath[1].maneuver.location[1]};
+                nextPoint = { lng: stepsPath[1].maneuver.location[0], lat: stepsPath[1].maneuver.location[1] };
                 const geojson = {
                     type: 'Feature',
                     properties: {},
