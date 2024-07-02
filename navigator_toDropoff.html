@@ -262,16 +262,6 @@
                     };
                     updateUserLocation(position);
                 }
-
-                function updateGeolocateButtonState() {
-                    const geolocateButton = geolocateControl._container;
-                    if (isViewLocked) {
-                        geolocateButton.classList.add('geolocate-locked');
-                    } else {
-                        geolocateButton.classList.remove('geolocate-locked');
-                    }
-                }
-
                 function updateUserLocation(position) {
                     // 更新位置历史
                     if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
@@ -361,6 +351,15 @@
                 geolocateControl.trigger(); // 觸發位置更新
             }
 
+            function updateGeolocateButtonState() {
+                    const geolocateButton = geolocateControl._container;
+                    if (isViewLocked) {
+                        geolocateButton.classList.add('geolocate-locked');
+                    } else {
+                        geolocateButton.classList.remove('geolocate-locked');
+                    }
+                }
+            
             function addMarker(location, label) {
                 for (let i = 0; i <= location.length - 1; i++) {
                     marker = new gomp.Marker({
@@ -466,7 +465,7 @@
             function updateFare() {
                 console.log("更新車資");
                 if (cardTextFare) {
-                    let nowTimer = (Date.now() - startTime) / 600;
+                    let nowTimer = (Date.now() - startTime) / 60000;
                     let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
                     cardTextFare.innerHTML = "目前車資：" + currentFare + "元";
                     console.log(Math.floor(nowTimer) + "分鐘" + estimatedDistance + "公里")
@@ -527,7 +526,7 @@
                     }
                 });
                 endTime = Date.now();
-                Timer = Math.floor((endTime - startTime) / 600);
+                Timer = Math.floor((endTime - startTime) / 60000);
                 console.log("結算中...");
                 final_time = Timer;
                 final_distance = totalMoveLength;
