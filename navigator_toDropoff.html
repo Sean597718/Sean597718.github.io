@@ -247,7 +247,6 @@
                 });
                 map.on('dragstart', function () {
                     isViewLocked = false;
-                    updateGeolocateButtonState();
                     showToast("視角已解鎖，可自由移動地圖");
                 });
 
@@ -346,19 +345,9 @@
                 event.preventDefault();
 
                 isViewLocked = true; // 重新鎖定視角
-                updateGeolocateButtonState();
                 showToast("視角已解鎖，可自由移動地圖");
                 geolocateControl.trigger(); // 觸發位置更新
             }
-
-            function updateGeolocateButtonState() {
-                    const geolocateButton = geolocateControl._container;
-                    if (isViewLocked) {
-                        geolocateButton.classList.add('geolocate-locked');
-                    } else {
-                        geolocateButton.classList.remove('geolocate-locked');
-                    }
-                }
             
             function addMarker(location, label) {
                 for (let i = 0; i <= location.length - 1; i++) {
@@ -423,8 +412,10 @@
             function computeDistance(point1, point2) {
                 if (!point1 || !point2 || typeof point1.lng !== 'number' || typeof point1.lat !== 'number' ||
                     typeof point2.lng !== 'number' || typeof point2.lat !== 'number') {
-                    console.error('Invalid coordinates:', point1, point2);
-                    return 0; // 返回 0 而不是拋出錯誤，以避免中斷執行
+                        const from = turf.point([point1[0], point1[1]]);
+                        const to = turf.point([point2[0], point2[1]]);
+                        const distance = turf.distance(from, to);
+                        return Math.floor(distance);
                 }
                 const from = turf.point([point1.lng, point1.lat]);
                 const to = turf.point([point2.lng, point2.lat]);
