@@ -639,28 +639,6 @@
 
         }
 
-        function findNextPointsToCurrentLocationTest(currentLocation, overviewPath) {
-            const coordinates = overviewPath;
-            const currentPoint = currentLocation;
-            for (let i = coordinates.length - 1; i >= 0; i -= 1) {
-                let startPoint = coordinates[i];
-                let endPoint = coordinates[i - 1];
-                let lineString = turf.lineString([
-                    [startPoint.lng, startPoint.lat],
-                    [endPoint.lng, endPoint.lat]
-                ]);
-                if (booleanPointOnLine(currentPoint, lineString)) {
-                    addMarker(endPoint, "O");
-                    console.log(endPoint.lat + "," + endPoint.lng);
-                    return endPoint;
-                } else {
-                    continue;
-                }
-            }
-            addMarker(overviewPath[1], "O");
-            return overviewPath[1];
-        }
-
         async function calcRoute(origin, destination) {
             const query = await fetch(
                 `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
@@ -705,14 +683,6 @@
                     }
                 });
 
-                /*stepsPath.forEach(step => {
-                    const marker = new gomp.Marker()
-                        .setLngLat(step.maneuver.location)
-                        .setPopup(new gomp.Popup({ offset: 25 }) // add popups
-                            .setHTML(`<h3>Type: ${step.maneuver.type}</h3><p>動作:${step.maneuver.modifier}</p><p>指示: ${step.name}</p>`))
-                        .addTo(map);
-                });*/
-
             };
 
 
@@ -733,30 +703,6 @@
             };
             return translations[instruction] || instruction;
         }
-
-        function countStepTypes(steps) {
-            const typeCounts = {};
-            steps.forEach(step => {
-                const type = step.maneuver.type;
-                if (typeCounts[type]) {
-                    typeCounts[type]++;
-                } else {
-                    typeCounts[type] = 1;
-                }
-            });
-
-            /*console.log("各 type 的数量:");
-            for (const type in typeCounts) {
-                console.log(`${type}: ${typeCounts[type]}個`);
-            }*/
-        }
-
-        function updateInstruction() {
-            document.getElementById("card-distance").innerText = formatDistance(Math.floor(stepsPath[currentStepIndex].distance));
-            document.getElementById("card-instruction").innerText = translateInstruction(stepsPath[currentStepIndex].maneuver.modifier) + '進入' + stepsPath[currentStepIndex].name;
-        }
-
-
 
     </script>
     </div>
