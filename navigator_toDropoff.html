@@ -383,16 +383,16 @@
         function updateNavigationInfo(nextStep, distance) {
             if (cardTextDistance && cardTextInstruction) {
                 console.log("更新指標")
-                const distance = formatDistance(distance);
-                const instruction = translateInstruction(nextStep.maneuver.modifier);
-                const roadName = nextStep.name;
+                const infoDistance = formatDistance(distance);
+                const infoInstruction = translateInstruction(nextStep.maneuver.modifier);
+                const infoRoadName = nextStep.name;
 
-                document.getElementById("card-distance").innerText = distance;
+                document.getElementById("card-distance").innerText = infoDistance;
                 document.getElementById("card-instruction").innerHTML = `
         <i class="fas fa-arrow-right"></i>
-        <span>${instruction}進入${roadName}</span>
+        <span>${infoInstruction}進入${infoRoadName}</span>
     `;
-                updateInstructionIcon(instruction);
+                updateInstructionIcon(infoInstruction);
             }
             else {
                 console.error('Missing card text elements:', cardTextDistance, cardTextInstruction);
