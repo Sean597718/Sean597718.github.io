@@ -383,6 +383,7 @@
         function updateNavigationInfo(nextStep, distance) {
             if (cardTextDistance && cardTextInstruction) {
                 console.log("更新指標")
+                console.log(distance)
                 const infoDistance = formatDistance(distance);
                 const infoInstruction = translateInstruction(nextStep.maneuver.modifier);
                 const infoRoadName = nextStep.name;
