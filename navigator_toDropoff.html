@@ -57,6 +57,73 @@
             right: 0;
             font-size: 12px;
         }
+
+        .navigation-card {
+            background-color: #f8f9fa;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .navigation-card .card-header {
+            background-color: #007bff;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 15px;
+        }
+
+        .navigation-card .card-body {
+            padding: 20px;
+        }
+
+        .navigation-info {
+            margin-bottom: 15px;
+        }
+
+        .distance {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .instruction i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+            color: #28a745;
+        }
+
+        .fare {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .navigation-card {
+                margin-bottom: 10px;
+            }
+
+            .distance {
+                font-size: 1.2rem;
+            }
+
+            .instruction {
+                font-size: 1rem;
+            }
+
+            .fare {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -64,311 +131,319 @@
     <div class="container-fluid">
         <div id="toastContainer" aria-live="polite" aria-atomic="true"
             style="position: fixed; top: 20px; right: 20px; z-index: 100;"></div>
-        <div class="row">
-            <div class="col-12">
-                <div class="text-white bg-success mb-3 card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">路徑指示</h5>
-                        <div>
-                            <button class="btn btn-light" id="prevButton">-</button>
-                            <button class="btn btn-light" id="nextButton">+</button>
-                        </div>
+        <<div class="card navigation-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">路徑指示</h5>
+            </div>
+            <div class="card-body">
+                <div class="navigation-info">
+                    <div id="card-distance" class="distance">300 公尺後</div>
+                    <div id="card-instruction" class="instruction">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>向右轉進入中正路</span>
                     </div>
-                    <div class="card-body">
-                        <h5 id="card-distance" class="card-title">路口距離</h5>
-                        <p id="card-instruction" class="card-text">詳細方向指示</p>
-                        <p id="card-fare" class="card-text">預估費用</p>
-                    </div>
+                </div>
+                <div id="card-fare" class="fare">目前車資：50元</div>
+            </div>
+    </div>
+    <!-- Modal for start-->
+    <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="startModalLabel"><i class="fa-solid fa-file-check fa-lg">行程確認</i>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>目的地: <span id="destination"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="startJourney()">
+                        <i class="bi bi-arrow-90deg-right"></i> 出發</button>
+                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle-fill"></i> 關閉</button>
                 </div>
             </div>
         </div>
-        <!-- Modal for start-->
-        <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="startModalLabel"><i class="fa-solid fa-file-check fa-lg">行程確認</i>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>目的地: <span id="destination"></span></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="startJourney()">
-                            <i class="bi bi-arrow-90deg-right"></i> 出發</button>
-                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle-fill"></i> 關閉</button>
-                    </div>
+    </div>
+    <!-- Modal for end-->
+    <div class="modal fade" id="endModal" tabindex="-1" aria-labelledby="endModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endModalLabel"><i class="fa-solid fa-file-check fa-lg">確認抵達</i></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <b>請確認是否已抵達乘客上車點</b>
+                    <b>送出後將傳送訊息告知乘客！</b>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        <i class="bi bi-clipboard-check-fill"></i> 確認已抵達</button>
+                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle-fill"></i> 關閉視窗</button>
                 </div>
             </div>
         </div>
-        <!-- Modal for end-->
-        <div class="modal fade" id="endModal" tabindex="-1" aria-labelledby="endModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="endModalLabel"><i class="fa-solid fa-file-check fa-lg">確認抵達</i></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <b>請確認是否已抵達乘客上車點</b>
-                        <b>送出後將傳送訊息告知乘客！</b>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                            <i class="bi bi-clipboard-check-fill"></i> 確認已抵達</button>
-                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle-fill"></i> 關閉視窗</button>
-                    </div>
-                </div>
-            </div>
+    </div>
+    <div id="map8Map" class="map"></div>
+    <div class="row">
+        <div class="d-grid">
+            <button class="btn btn-danger btn-block" type="button" data-bs-toggle="modal" data-bs-target="#endModal"
+                onclick="endJourney()">
+                <i class="fa-solid fa-flag-checkered fa-lg"></i><b> 結束行程</b>
+            </button>
         </div>
-        <div id="map8Map" class="map"></div>
-        <div class="row">
-            <div class="d-grid">
-                <button class="btn btn-danger btn-block" type="button" data-bs-toggle="modal" data-bs-target="#endModal"
-                    onclick="endJourney()">
-                    <i class="fa-solid fa-flag-checkered fa-lg"></i><b> 結束行程</b>
-                </button>
-            </div>
-        </div>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js"
-            integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN"
-            crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js"
-            integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/"
-            crossorigin="anonymous"></script>
-        <script
-            src="https://api.map8.zone/maps/js/gomp.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
-        <script type="text/javascript"
-            src="https://api.map8.zone/maps/js/gomp-web-service-js-client.min.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-        <script type="text/javascript"
-            src="https://api.map8.zone/maps/js/map8-js-route.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
-        <script>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js"
+        integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js"
+        integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/"
+        crossorigin="anonymous"></script>
+    <script
+        src="https://api.map8.zone/maps/js/gomp.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
+    <script type="text/javascript"
+        src="https://api.map8.zone/maps/js/gomp-web-service-js-client.min.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <script type="text/javascript"
+        src="https://api.map8.zone/maps/js/map8-js-route.js?key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4"></script>
+    <script>
 
-            //javascript.js
-            //set map options
-            let map,
-                gompWebServiceJsClient,
-                route,
-                start_at,
-                json;
-            let arrivalLatLng = [121.5173399, 25.0475613]; // 目的地座標
-            let goState = false; // 是否開始導航
-            let stepsPath = []; // 路線暫存
-            let currentStepIndex = 1; // 目前所在步驟的索引
-            let currentStep = null; // 目前所在步驟
-            let nextStep = null; // 下一個步驟
-            let nextPoint = null; // 行徑方向下一個點座標
-            let mapRotation = 0; // 地圖旋轉角度
-            let NowLatLng = null; // 目前所在位置
-            let endPosition = null; // 目的地位置
-            let positionRecord = []; // 紀錄移動路徑的陣列
-            let Pathpolyline = null; // 移動路徑的線段
-            let estimatedDistance = 0; // 預估距離
-            let moveDistance = 0; // 移動距離
-            let totalMoveLength = 0; // 移動路徑的總長度
-            let idlePosition = null; // 怠速開始位置
-            let Timer = 0; // 計時器
-            let startTime = null; // 起始時間
-            let endTime = null; // 結束時間
-            let nowposition = null; // 目前所在位置
-            const cardTextDistance = document.querySelector("#card-distance");
-            const cardTextInstruction = document.querySelector("#card-instruction");
-            const cardTextFare = document.querySelector("#card-fare");
-            let routeData; // 路線資料
-            let watchPositionId; // 監聽位置的 ID
-            let base_fare = 50; // 基本車資
-            let fare = 0; // 車資
-            let isViewLocked = true; // 默認鎖定視角
-            const totalDistanceElement = document.getElementById("total-distance");
-            const totalFareElement = document.getElementById("total-fare");
+        //javascript.js
+        //set map options
+        let map,
+            gompWebServiceJsClient,
+            route,
+            start_at,
+            json;
+        let arrivalLatLng = [121.5173399, 25.0475613]; // 目的地座標
+        let goState = false; // 是否開始導航
+        let stepsPath = []; // 路線暫存
+        let currentStepIndex = 1; // 目前所在步驟的索引
+        let currentStep = null; // 目前所在步驟
+        let nextStep = null; // 下一個步驟
+        let nextPoint = null; // 行徑方向下一個點座標
+        let mapRotation = 0; // 地圖旋轉角度
+        let NowLatLng = null; // 目前所在位置
+        let endPosition = null; // 目的地位置
+        let positionRecord = []; // 紀錄移動路徑的陣列
+        let Pathpolyline = null; // 移動路徑的線段
+        let estimatedDistance = 0; // 預估距離
+        let moveDistance = 0; // 移動距離
+        let totalMoveLength = 0; // 移動路徑的總長度
+        let idlePosition = null; // 怠速開始位置
+        let Timer = 0; // 計時器
+        let startTime = null; // 起始時間
+        let endTime = null; // 結束時間
+        let nowposition = null; // 目前所在位置
+        const cardTextDistance = document.querySelector("#card-distance");
+        const cardTextInstruction = document.querySelector("#card-instruction");
+        const cardTextFare = document.querySelector("#card-fare");
+        let routeData; // 路線資料
+        let watchPositionId; // 監聽位置的 ID
+        let base_fare = 50; // 基本車資
+        let fare = 0; // 車資
+        let isViewLocked = true; // 默認鎖定視角
+        const totalDistanceElement = document.getElementById("total-distance");
+        const totalFareElement = document.getElementById("total-fare");
 
-            //初始化地圖
-            let marker;
-            let startModal, endModal;
-            document.addEventListener("DOMContentLoaded", function () {
-                startModal = new bootstrap.Modal(document.getElementById("startModal"));
-                endModal = new bootstrap.Modal(document.getElementById("endModal"));
-                gomp.accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4';
-                initMap();
+        //初始化地圖
+        let marker;
+        let startModal, endModal;
+        document.addEventListener("DOMContentLoaded", function () {
+            startModal = new bootstrap.Modal(document.getElementById("startModal"));
+            endModal = new bootstrap.Modal(document.getElementById("endModal"));
+            gomp.accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsIm5hbWUiOiJqaW5icy5pbmZvQGdtYWlsLmNvbSIsImlhdCI6MTcxNzYzODg0Niwib2JqZWN0cyI6WyJcL21hcHNcL2pzIiwiXC9tYXBzXC9zdGF0aWMiLCJcL3BsYWNlXC9nZW9jb2RlIiwiXC9wbGFjZVwvZmluZHBsYWNlZnJvbXRleHQiLCJcL3BsYWNlXC9uZWFyYnlzZWFyY2giLCJcL3BsYWNlXC90ZXh0c2VhcmNoIiwiXC9wbGFjZVwvYXV0b2NvbXBsZXRlIiwiXC9kYXRhIiwiXC9zdHlsZXMiLCJcL3Nwcml0ZXMiLCJcL2ZvbnRzIiwiXC9yb3V0ZVwvZGlyZWN0aW9ucyIsIlwvcm91dGVcL2Rpc3RhbmNlbWF0cml4IiwiXC9yb3V0ZVwvdHJpcCIsIlwvcm9hZFwvbmVhcmVzdFJvYWRzIiwiXC9yb2FkXC9zbmFwVG9Sb2FkcyIsIlwvcm91dGVcL3ZycCIsIlwvYWRkcmVzc1wvc3RhbmRhcmRpemF0aW9uIl0sImV4cCI6MTcyMDE3MTgwNn0.Bk_GgGRH-vpYD-Rq4NDMa7XoiJ12LAadPBdTEA20Sh4';
+            initMap();
+        });
+
+        function initMap() {
+            const initLatLng = [121.5173399, 25.0475613];
+            const mapOptions = {
+                container: 'map8Map',
+                style: 'https://api.map8.zone/styles/go-life-maps-tw-style-std/style.json',
+                center: initLatLng,
+                zoom: 18,
+                pitch: 60,
+                bearing: 0,
+            };
+
+            map = new gomp.Map(mapOptions);
+            map.addControl(new gomp.NavigationControl({ showZoom: false }));
+
+            // 创建GeolocateControl
+            const geolocateControl = new gomp.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true,
+                },
+                trackUserLocation: true,
+                showUserHeading: true,
+                showUserLocation: true,
+
+                maxZoom: 15 // 自訂縮放大小
+
             });
 
-            function initMap() {
-                const initLatLng = [121.5173399, 25.0475613];
-                const mapOptions = {
-                    container: 'map8Map',
-                    style: 'https://api.map8.zone/styles/go-life-maps-tw-style-std/style.json',
-                    center: initLatLng,
-                    zoom: 18,
-                    pitch: 60,
-                    bearing: 0,
-                };
+            // 将GeolocateControl添加到地图
+            map.addControl(geolocateControl, 'bottom-right');
+            // 將 GeolocateControl 添加到地圖後
+            geolocateControl._container.onclick = handleGeolocateClick;
+            gompWebServiceJsClient = new GompWebServiceJsClient({ key: gomp.accessToken });
+            map8Route = new Map8Route({
+                gompWebServiceJsClient: gompWebServiceJsClient,
+            });
+            map.addControl(map8Route);
 
-                map = new gomp.Map(mapOptions);
-                map.addControl(new gomp.NavigationControl({ showZoom: false }));
+            // 监听地图加载完成事件
+            map.on('load', function () {
+                /* 绑定GeolocateControl的点击事件
+                geolocateControl._container.onclick = handleGeolocateClick;*/
+                // 地图加载完成后自动触发geolocation
+                geolocateControl.trigger();
 
-                // 创建GeolocateControl
-                const geolocateControl = new gomp.GeolocateControl({
-                    positionOptions: {
-                        enableHighAccuracy: true,
-                    },
-                    trackUserLocation: true,
-                    showUserHeading: true,
-                    showUserLocation: true,
-
-                    maxZoom: 15 // 自訂縮放大小
-
-                });
-
-                // 将GeolocateControl添加到地图
-                map.addControl(geolocateControl, 'bottom-right');
-                // 將 GeolocateControl 添加到地圖後
-                geolocateControl._container.onclick = handleGeolocateClick;
-                gompWebServiceJsClient = new GompWebServiceJsClient({ key: gomp.accessToken });
-                map8Route = new Map8Route({
-                    gompWebServiceJsClient: gompWebServiceJsClient,
-                });
-                map.addControl(map8Route);
-
-                // 监听地图加载完成事件
-                map.on('load', function () {
-                    /* 绑定GeolocateControl的点击事件
-                    geolocateControl._container.onclick = handleGeolocateClick;*/
-                    // 地图加载完成后自动触发geolocation
-                    geolocateControl.trigger();
-
-                    // 监听位置更新事件
-                    geolocateControl.on('geolocate', handleGeolocate);
-                    startModal.show();
-                    document.getElementById("destination").innerText = arrivalLatLng;
-                });
-                map.on('dragstart', function () {
-                    isViewLocked = false;
-                    showToast("視角已解鎖，可自由移動地圖");
-                });
-
-                function handleGeolocate(e) {
-                    if (typeof e.coords.latitude !== 'number' || typeof e.coords.longitude !== 'number') {
-                        console.error('Invalid geolocation data:', e.coords);
-                        return;
-                    }
-                    const position = {
-                        lat: e.coords.latitude,
-                        lng: e.coords.longitude
-                    };
-                    updateUserLocation(position);
-                }
-                function updateUserLocation(position) {
-                    // 更新位置历史
-                    if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
-                        console.error('Invalid position:', position);
-                        return;
-                    }
-                    const roundedPosition = {
-                        lat: LatLngtoFloor(position.lat),
-                        lng: LatLngtoFloor(position.lng)
-                    };
-                    NowLatLng = roundedPosition;
-                    positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
-                    // 更新地图上的标记或其他需要的位置更新操作
-                    if (!nowposition) {
-                        nowposition = new gomp.Marker({
-                            position: roundedPosition,
-                            map: map,
-                        });
-                    } else {
-                        nowposition.setLngLat(roundedPosition);
-                    }
-                    if (goState) {
-                        recordPosition(NowLatLng);
-                    }
-                }
-            }
-
-            function checkPositionOnRoute(position, routes) {
-                //const currentPoint = {lng: position.lng, lat: position.lat};
-                const currentPoint = turf.point([position.lng, position.lat])
-                // 遍历所有路段
-                for (let i = 0; i < routes.length - 1; i++) {
-                    const start = { lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1] };
-                    const end = { lng: routes[i + 1].maneuver.location[0], lat: routes[i + 1].maneuver.location[1] };
-                    // 创建当前路段的lineString
-                    const segment = turf.lineString([
-                        [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
-                        [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
-                    ]);
-                    // 检查当前位置是否在这个路段上
-                    if (turf.pointToLineDistance(currentPoint, segment) < 0.03) {
-                        // 如果在路段上，计算到下一个转弯点的距离
-                        const distanceToNextTurn = turf.distance(currentPoint, turf.point([end.lng, end.lat]));
-                        nextPoint = end;
-                        // 更新导航信息
-                        updateNavigationInfo(stepsPath[i + 1], distanceToNextTurn);
-
-                        return true; // 表示在路线上
-                    }
-                    else {
-                        continue
-                    }
-                }
-                return false;
-            }
-            function updateNavigationInfo(nextStep, distance) {
-                if (cardTextDistance && cardTextInstruction) {
-                    console.log("更新指標")
-                    cardTextDistance.innerHTML = formatDistance(distance);
-                    cardTextInstruction.innerHTML = translateInstruction(nextStep.maneuver.modifier) + '進入' + nextStep.name;
-                }
-            }
-
-            function handlePositionUpdate(position) {
-                console.log("處理位置更新");
-                const isOnRoute = checkPositionOnRoute(position, stepsPath);
-
-                if (isOnRoute) {
-                    // 在路线上，继续当前导航
-                    console.log("在规划路线上");
-                } else {
-                    // 不在路线上，重新规划路径
-                    console.log("不在规划路线上，重新规划路径");
-                    calcRoute(position, arrivalLatLng);
-                }
-            }
-
-            // 處理 GeolocateControl 點擊事件的函數
-            function handleGeolocateClick(event) {
-                // 防止事件冒泡和默認行為
-                event.stopPropagation();
-                event.preventDefault();
-
-                isViewLocked = true; // 重新鎖定視角
+                // 监听位置更新事件
+                geolocateControl.on('geolocate', handleGeolocate);
+                startModal.show();
+                document.getElementById("destination").innerText = arrivalLatLng;
+            });
+            map.on('dragstart', function () {
+                isViewLocked = false;
                 showToast("視角已解鎖，可自由移動地圖");
-                geolocateControl.trigger(); // 觸發位置更新
-            }
-            
-            function addMarker(location, label) {
-                for (let i = 0; i <= location.length - 1; i++) {
-                    marker = new gomp.Marker({
-                        position: location[i],
-                        map: map,
-                        label: label,
-                    });
+            });
 
-                    setTimeout(function () {
-                        marker.remove();
-                    }, 3000);
+            function handleGeolocate(e) {
+                if (typeof e.coords.latitude !== 'number' || typeof e.coords.longitude !== 'number') {
+                    console.error('Invalid geolocation data:', e.coords);
+                    return;
+                }
+                const position = {
+                    lat: e.coords.latitude,
+                    lng: e.coords.longitude
+                };
+                updateUserLocation(position);
+            }
+            function updateUserLocation(position) {
+                // 更新位置历史
+                if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+                    console.error('Invalid position:', position);
+                    return;
+                }
+                const roundedPosition = {
+                    lat: LatLngtoFloor(position.lat),
+                    lng: LatLngtoFloor(position.lng)
+                };
+                NowLatLng = roundedPosition;
+                positionRecord.push([roundedPosition.lng, roundedPosition.lat]);
+                // 更新地图上的标记或其他需要的位置更新操作
+                if (!nowposition) {
+                    nowposition = new gomp.Marker({
+                        position: roundedPosition,
+                        map: map,
+                    });
+                } else {
+                    nowposition.setLngLat(roundedPosition);
+                }
+                if (goState) {
+                    recordPosition(NowLatLng);
                 }
             }
+        }
 
-            function showToast(message, duration = 5000) {
-                let toastElement = document.createElement("div");
-                toastElement.classList.add("toast");
-                toastElement.classList.add("show");
+        function checkPositionOnRoute(position, routes) {
+            //const currentPoint = {lng: position.lng, lat: position.lat};
+            const currentPoint = turf.point([position.lng, position.lat])
+            // 遍历所有路段
+            for (let i = 0; i < routes.length - 1; i++) {
+                const start = { lng: routes[i].maneuver.location[0], lat: routes[i].maneuver.location[1] };
+                const end = { lng: routes[i + 1].maneuver.location[0], lat: routes[i + 1].maneuver.location[1] };
+                // 创建当前路段的lineString
+                const segment = turf.lineString([
+                    [routes[i].maneuver.location[0], routes[i].maneuver.location[1]],
+                    [routes[i + 1].maneuver.location[0], routes[i + 1].maneuver.location[1]]
+                ]);
+                // 检查当前位置是否在这个路段上
+                if (turf.pointToLineDistance(currentPoint, segment) < 0.03) {
+                    // 如果在路段上，计算到下一个转弯点的距离
+                    const distanceToNextTurn = turf.distance(currentPoint, turf.point([end.lng, end.lat]));
+                    nextPoint = end;
+                    // 更新导航信息
+                    updateNavigationInfo(stepsPath[i + 1], distanceToNextTurn);
 
-                toastElement.innerHTML = `
+                    return true; // 表示在路线上
+                }
+                else {
+                    continue
+                }
+            }
+            return false;
+        }
+        function updateNavigationInfo(nextStep, distance) {
+            if (cardTextDistance && cardTextInstruction) {
+                console.log("更新指標")
+                const distance = formatDistance(distance);
+                const instruction = translateInstruction(nextStep.maneuver.modifier);
+                const roadName = nextStep.name;
+
+                document.getElementById("card-distance").innerText = distance;
+                document.getElementById("card-instruction").innerHTML = `
+        <i class="fas fa-arrow-right"></i>
+        <span>${instruction}進入${roadName}</span>
+    `;
+                updateInstructionIcon(instruction);
+            }
+            else {
+                console.error('Missing card text elements:', cardTextDistance, cardTextInstruction);
+            }
+        }
+
+        function handlePositionUpdate(position) {
+            console.log("處理位置更新");
+            const isOnRoute = checkPositionOnRoute(position, stepsPath);
+
+            if (isOnRoute) {
+                // 在路线上，继续当前导航
+                console.log("在规划路线上");
+            } else {
+                // 不在路线上，重新规划路径
+                console.log("不在规划路线上，重新规划路径");
+                calcRoute(position, arrivalLatLng);
+            }
+        }
+
+        // 處理 GeolocateControl 點擊事件的函數
+        function handleGeolocateClick(event) {
+            // 防止事件冒泡和默認行為
+            event.stopPropagation();
+            event.preventDefault();
+
+            isViewLocked = true; // 重新鎖定視角
+            showToast("視角已解鎖，可自由移動地圖");
+            geolocateControl.trigger(); // 觸發位置更新
+        }
+
+        function addMarker(location, label) {
+            for (let i = 0; i <= location.length - 1; i++) {
+                marker = new gomp.Marker({
+                    position: location[i],
+                    map: map,
+                    label: label,
+                });
+
+                setTimeout(function () {
+                    marker.remove();
+                }, 3000);
+            }
+        }
+
+        function showToast(message, duration = 5000) {
+            let toastElement = document.createElement("div");
+            toastElement.classList.add("toast");
+            toastElement.classList.add("show");
+
+            toastElement.innerHTML = `
       <div class="toast-header">
         <strong class="me-auto">程式通知</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -378,307 +453,311 @@
       </div>
     `;
 
-                document.getElementById("toastContainer").appendChild(toastElement);
+            document.getElementById("toastContainer").appendChild(toastElement);
 
-                setTimeout(function () {
-                    toastElement.remove();
-                }, duration);
+            setTimeout(function () {
+                toastElement.remove();
+            }, duration);
+        }
+        function computeHeading(start, end) {
+            const bearing = turf.bearing(
+                turf.point([start.lng, start.lat]),
+                turf.point([end.lng, end.lat])
+            );
+            return (bearing + 360) % 360; // 確保結果在 0-360 度範圍內
+        }
+        function headingCorrection(heading) {
+            if (heading < 0) {
+                heading += 360;
             }
-            function computeHeading(start, end) {
-                const bearing = turf.bearing(
-                    turf.point([start.lng, start.lat]),
-                    turf.point([end.lng, end.lat])
-                );
-                return (bearing + 360) % 360; // 確保結果在 0-360 度範圍內
-            }
-            function headingCorrection(heading) {
-                if (heading < 0) {
-                    heading += 360;
-                }
-                return heading;
-            }
+            return heading;
+        }
 
-            function formatDistance(distance) {
-                if (distance > 1) {
-                    const kilometers = distance.toFixed(1);
-                    return kilometers + " 公里後";
-                } else {
-                    let distanceM = distance * 1000
-                    const meters = Math.round(distance / 10) * 10;;
-                    return meters + " 公尺後";
-                }
+        function formatDistance(distance) {
+            if (distance > 1) {
+                const kilometers = distance.toFixed(1);
+                return kilometers + " 公里後";
+            } else {
+                let distanceM = distance * 1000
+                const meters = Math.round(distance / 10) * 10;;
+                return meters + " 公尺後";
             }
+        }
 
-            function computeDistance(point1, point2) {
-                if (!point1 || !point2 || typeof point1.lng !== 'number' || typeof point1.lat !== 'number' ||
-                    typeof point2.lng !== 'number' || typeof point2.lat !== 'number') {
-                        const from = turf.point([point1[0], point1[1]]);
-                        const to = turf.point([point2[0], point2[1]]);
-                        const distance = turf.distance(from, to);
-                        return Math.floor(distance);
-                }
-                const from = turf.point([point1.lng, point1.lat]);
-                const to = turf.point([point2.lng, point2.lat]);
-                const distance = turf.distance(from, to, { units: 'meters' });
+        function computeDistance(point1, point2) {
+            if (!point1 || !point2 || typeof point1.lng !== 'number' || typeof point1.lat !== 'number' ||
+                typeof point2.lng !== 'number' || typeof point2.lat !== 'number') {
+                const from = turf.point([point1[0], point1[1]]);
+                const to = turf.point([point2[0], point2[1]]);
+                const distance = turf.distance(from, to);
                 return Math.floor(distance);
             }
+            const from = turf.point([point1.lng, point1.lat]);
+            const to = turf.point([point2.lng, point2.lat]);
+            const distance = turf.distance(from, to, { units: 'meters' });
+            return Math.floor(distance);
+        }
 
-            function deg2rad(deg) {
-                return deg * (Math.PI / 180);
-            }
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
 
-            function LatLngtoFloor(number) {
-                let factor = Math.pow(10, 5);
-                let truncatedNumber = Math.floor(number * factor) / factor;
-                return truncatedNumber;
-            }
-            // 更新目前行駛距離
-            function updateEstimatedDistance() {
-                estimatedDistance = positionRecord.reduce((total, currentValue, index, array) => {
-                    if (index > 0) {
-                        const previousPoint = array[index - 1];
-                        if (Array.isArray(previousPoint) && Array.isArray(currentValue) &&
-                            previousPoint.length === 2 && currentValue.length === 2) {
-                            return total + computeDistance(
-                                { lng: previousPoint[0], lat: previousPoint[1] },
-                                { lng: currentValue[0], lat: currentValue[1] }
-                            );
-                        } else {
-                            console.error('Invalid position record:', previousPoint, currentValue);
-                            return total;
-                        }
+        function LatLngtoFloor(number) {
+            let factor = Math.pow(10, 5);
+            let truncatedNumber = Math.floor(number * factor) / factor;
+            return truncatedNumber;
+        }
+        // 更新目前行駛距離
+        function updateEstimatedDistance() {
+            estimatedDistance = positionRecord.reduce((total, currentValue, index, array) => {
+                if (index > 0) {
+                    const previousPoint = array[index - 1];
+                    if (Array.isArray(previousPoint) && Array.isArray(currentValue) &&
+                        previousPoint.length === 2 && currentValue.length === 2) {
+                        return total + computeDistance(
+                            { lng: previousPoint[0], lat: previousPoint[1] },
+                            { lng: currentValue[0], lat: currentValue[1] }
+                        );
+                    } else {
+                        console.error('Invalid position record:', previousPoint, currentValue);
+                        return total;
                     }
-                    return total;
-                }, 0);
-                estimatedDistance = Math.floor(estimatedDistance / 1000);
-            }
-            // 更新車資
-            function updateFare() {
-                console.log("更新車資");
-                if (cardTextFare) {
-                    let nowTimer = (Date.now() - startTime) / 60000;
-                    let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
-                    cardTextFare.innerHTML = "目前車資：" + currentFare + "元";
-                    console.log(Math.floor(nowTimer) + "分鐘" + estimatedDistance + "公里")
                 }
+                return total;
+            }, 0);
+            estimatedDistance = Math.floor(estimatedDistance / 1000);
+        }
+        // 更新車資
+        function updateFare() {
+            console.log("更新車資");
+            if (cardTextFare) {
+                let nowTimer = (Date.now() - startTime) / 60000;
+                let currentFare = 50 + Math.floor(nowTimer) * 2 + estimatedDistance * 20;
+                cardTextFare.innerHTML = "目前車資：" + currentFare + "元";
+                console.log(Math.floor(nowTimer) + "分鐘" + estimatedDistance + "公里")
             }
-            // 更新鏡頭視角
-            function updateMapView(position) {
-                console.log("更新地圖視角");
-                if (isViewLocked) {
-                    let heading = computeHeading(position, nextPoint);
-                    nowposition.setLngLat(position);
-                    map.easeTo({
-                        center: position,
-                        zoom: 17,
-                        pitch: 80,
-                        bearing: heading,
-                        duration: 1000 // 添加過渡動畫，使移動更平滑
-                    });
+        }
+        // 更新鏡頭視角
+        function updateMapView(position) {
+            console.log("更新地圖視角");
+            if (isViewLocked) {
+                let heading = computeHeading(position, nextPoint);
+                nowposition.setLngLat(position);
+                map.easeTo({
+                    center: position,
+                    zoom: 17,
+                    pitch: 80,
+                    bearing: heading,
+                    duration: 1000 // 添加過渡動畫，使移動更平滑
+                });
+            } else {
+                // 僅更新位置標記，不改變地圖視角
+                nowposition.setLngLat(position);
+            }
+        }
+
+        function updateInstructionIcon(instruction) {
+            const iconElement = document.querySelector('#card-instruction i');
+            let iconClass = 'fa-arrow-right'; // 默認為右箭頭
+
+            switch (instruction) {
+                case '向左轉':
+                    iconClass = 'fa-arrow-left';
+                    break;
+                case '向右轉':
+                    iconClass = 'fa-arrow-right';
+                    break;
+                case '直行':
+                    iconClass = 'fa-arrow-up';
+                    break;
+                case '迴轉':
+                    iconClass = 'fa-arrows-retweet';
+                    break;
+                case '微向左轉':
+                    iconClass = 'fa-up-left';
+                    break;
+                case '微向右轉':
+                    iconClass = 'fa-up-right';
+                    break;
+                // 可以根據需要添加更多情況
+            }
+
+            iconElement.className = `fas ${iconClass}`;
+        }
+
+        function recordPosition(position) {
+            console.log("紀錄位置相關功能");
+            // 更新目前行駛距離與車資
+            updateEstimatedDistance();
+            updateFare();
+            // 检查位置是否在路线上并处理
+            handlePositionUpdate(position);
+            // 更新地图视图
+            updateMapView(position);
+        }
+
+        function showError(error) {
+            console.log("Error getting location: " + error.message);
+        }
+
+        function startJourney() {
+            if (startTime == null) {
+                startTime = Date.now();
+                endTime = null;
+            }
+            goState = true;
+
+            calcRoute(NowLatLng, arrivalLatLng);
+        }
+
+        function endJourney() {
+            positionRecord.forEach((currentValue, index) => {
+                if (index > 0) {
+                    const previousPoint = positionRecord[index - 1];
+                    const distance = computeDistance(previousPoint, currentValue);
+                    totalMoveLength += distance;
+                    if (index === positionRecord.length - 1) {
+                        totalMoveLength = Math.floor(totalMoveLength / 1000);
+                    }
+                }
+            });
+            endTime = Date.now();
+            Timer = Math.floor((endTime - startTime) / 60000);
+            console.log("結算中...");
+            final_time = Timer;
+            final_distance = totalMoveLength;
+
+            if (totalDistanceElement && totalFareElement) {
+                final_fare = base_fare + Timer * 2 + totalMoveLength * 20;
+                totalDistanceElement.innerText = final_distance + " 公里";
+                if (final_fare < 100 || isNaN(final_fare)) {
+                    final_fare = 100;
+                }
+                totalFareElement.innerText = final_fare + " 元";
+            }
+
+        }
+
+        function findNextPointsToCurrentLocationTest(currentLocation, overviewPath) {
+            const coordinates = overviewPath;
+            const currentPoint = currentLocation;
+            for (let i = coordinates.length - 1; i >= 0; i -= 1) {
+                let startPoint = coordinates[i];
+                let endPoint = coordinates[i - 1];
+                let lineString = turf.lineString([
+                    [startPoint.lng, startPoint.lat],
+                    [endPoint.lng, endPoint.lat]
+                ]);
+                if (booleanPointOnLine(currentPoint, lineString)) {
+                    addMarker(endPoint, "O");
+                    console.log(endPoint.lat + "," + endPoint.lng);
+                    return endPoint;
                 } else {
-                    // 僅更新位置標記，不改變地圖視角
-                    nowposition.setLngLat(position);
+                    continue;
                 }
             }
-            function recordPosition(position) {
-                console.log("紀錄位置相關功能");
-                // 更新目前行駛距離與車資
-                updateEstimatedDistance();
-                updateFare();
-                // 检查位置是否在路线上并处理
-                handlePositionUpdate(position);
-                // 更新地图视图
-                updateMapView(position);
-            }
+            addMarker(overviewPath[1], "O");
+            return overviewPath[1];
+        }
 
-            function showError(error) {
-                console.log("Error getting location: " + error.message);
-            }
-
-            function startJourney() {
-                if (startTime == null) {
-                    startTime = Date.now();
-                    endTime = null;
+        async function calcRoute(origin, destination) {
+            const query = await fetch(
+                `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
+                { method: 'GET' }
+            );
+            json = await query.json();
+            console.log(json);
+            routeData = json.routes[0];
+            route = routeData.geometry.coordinates;
+            stepsPath = routeData.legs[0].steps;
+            console.log(stepsPath);
+            nextPoint = { lng: stepsPath[1].maneuver.location[0], lat: stepsPath[1].maneuver.location[1] };
+            const geojson = {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: route
                 }
-                goState = true;
-
-                calcRoute(NowLatLng, arrivalLatLng);
+            };
+            // if the route already exists on the map, we'll reset it using setData
+            if (map.getSource('route')) {
+                map.getSource('route').setData(geojson);
             }
-
-            function endJourney() {
-                positionRecord.forEach((currentValue, index) => {
-                    if (index > 0) {
-                        const previousPoint = positionRecord[index - 1];
-                        const distance = computeDistance(previousPoint, currentValue);
-                        totalMoveLength += distance;
-                        if (index === positionRecord.length - 1) {
-                            totalMoveLength = Math.floor(totalMoveLength / 1000);
-                        }
-                    }
-                });
-                endTime = Date.now();
-                Timer = Math.floor((endTime - startTime) / 60000);
-                console.log("結算中...");
-                final_time = Timer;
-                final_distance = totalMoveLength;
-
-                if (totalDistanceElement && totalFareElement) {
-                    final_fare = base_fare + Timer * 2 + totalMoveLength * 20;
-                    totalDistanceElement.innerText = final_distance + " 公里";
-                    if (final_fare < 100 || isNaN(final_fare)) {
-                        final_fare = 100;
-                    }
-                    totalFareElement.innerText = final_fare + " 元";
-                }
-
-            }
-
-            function findNextPointsToCurrentLocationTest(currentLocation, overviewPath) {
-                const coordinates = overviewPath;
-                const currentPoint = currentLocation;
-                for (let i = coordinates.length - 1; i >= 0; i -= 1) {
-                    let startPoint = coordinates[i];
-                    let endPoint = coordinates[i - 1];
-                    let lineString = turf.lineString([
-                        [startPoint.lng, startPoint.lat],
-                        [endPoint.lng, endPoint.lat]
-                    ]);
-                    if (booleanPointOnLine(currentPoint, lineString)) {
-                        addMarker(endPoint, "O");
-                        console.log(endPoint.lat + "," + endPoint.lng);
-                        return endPoint;
-                    } else {
-                        continue;
-                    }
-                }
-                addMarker(overviewPath[1], "O");
-                return overviewPath[1];
-            }
-
-            async function calcRoute(origin, destination) {
-                const query = await fetch(
-                    `https://api.map8.zone/route/car/${NowLatLng.lng},${NowLatLng.lat};${arrivalLatLng[0]},${arrivalLatLng[1]}.json?key=${gomp.accessToken}&steps=${true}&alternatives=${true}`,
-                    { method: 'GET' }
-                );
-                json = await query.json();
-                console.log(json);
-                routeData = json.routes[0];
-                route = routeData.geometry.coordinates;
-                stepsPath = routeData.legs[0].steps;
-                console.log(stepsPath);
-                nextPoint = { lng: stepsPath[1].maneuver.location[0], lat: stepsPath[1].maneuver.location[1] };
-                const geojson = {
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: route
-                    }
-                };
-                // if the route already exists on the map, we'll reset it using setData
-                if (map.getSource('route')) {
-                    map.getSource('route').setData(geojson);
-                }
-                // otherwise, we'll make a new request
-                else {
-                    map.addLayer({
-                        id: 'route',
-                        type: 'line',
-                        source: {
-                            type: 'geojson',
-                            data: geojson
-                        },
-                        layout: {
-                            'line-join': 'round',
-                            'line-cap': 'round'
-                        },
-                        paint: {
-                            'line-color': '#3887be',
-                            'line-width': 5,
-                            'line-opacity': 0.75
-                        }
-                    });
-
-                    /*stepsPath.forEach(step => {
-                        const marker = new gomp.Marker()
-                            .setLngLat(step.maneuver.location)
-                            .setPopup(new gomp.Popup({ offset: 25 }) // add popups
-                                .setHTML(`<h3>Type: ${step.maneuver.type}</h3><p>動作:${step.maneuver.modifier}</p><p>指示: ${step.name}</p>`))
-                            .addTo(map);
-                    });*/
-
-                };
-
-                //countStepTypes(stepsPath);
-
-                document.getElementById("prevButton").addEventListener("click", function () {
-                    if (currentStepIndex > 0) {
-                        currentStepIndex--;
-                        updateInstruction();
+            // otherwise, we'll make a new request
+            else {
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: {
+                        type: 'geojson',
+                        data: geojson
+                    },
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#3887be',
+                        'line-width': 5,
+                        'line-opacity': 0.75
                     }
                 });
 
-                document.getElementById("nextButton").addEventListener("click", function () {
-                    if (currentStepIndex < stepsPath.length - 1) {
-                        currentStepIndex++;
-                        updateInstruction();
-                    }
-                });
-            }
-            // add turn instructions here at the end
-            function translateInstruction(instruction) {
-                const translations = {
-                    'uturn': '迴轉',
-                    'straight': '直行',
-                    'left': '向左轉',
-                    'right': '向右轉',
-                    'slight left': '微向左轉',
-                    'slight right': '微向右轉',
-                    'sharp left': '向左急轉',
-                    'sharp right': '向右急轉',
+                /*stepsPath.forEach(step => {
+                    const marker = new gomp.Marker()
+                        .setLngLat(step.maneuver.location)
+                        .setPopup(new gomp.Popup({ offset: 25 }) // add popups
+                            .setHTML(`<h3>Type: ${step.maneuver.type}</h3><p>動作:${step.maneuver.modifier}</p><p>指示: ${step.name}</p>`))
+                        .addTo(map);
+                });*/
 
-                };
-                return translations[instruction] || instruction;
-            }
+            };
 
-            function countStepTypes(steps) {
-                const typeCounts = {};
-                steps.forEach(step => {
-                    const type = step.maneuver.type;
-                    if (typeCounts[type]) {
-                        typeCounts[type]++;
-                    } else {
-                        typeCounts[type] = 1;
-                    }
-                });
 
-                /*console.log("各 type 的数量:");
-                for (const type in typeCounts) {
-                    console.log(`${type}: ${typeCounts[type]}個`);
-                }*/
-            }
+        };
 
-            function updateInstruction() {
-                document.getElementById("card-distance").innerText = formatDistance(Math.floor(stepsPath[currentStepIndex].distance));
-                document.getElementById("card-instruction").innerText = translateInstruction(stepsPath[currentStepIndex].maneuver.modifier) + '進入' + stepsPath[currentStepIndex].name;
-            }
+        // add turn instructions here at the end
+        function translateInstruction(instruction) {
+            const translations = {
+                'uturn': '迴轉',
+                'straight': '直行',
+                'left': '向左轉',
+                'right': '向右轉',
+                'slight left': '微向左轉',
+                'slight right': '微向右轉',
+                'sharp left': '向左急轉',
+                'sharp right': '向右急轉',
 
-            document.getElementById("prevButton").addEventListener("click", function () {
-                if (currentStepIndex > 0) {
-                    currentStepIndex--;
-                    updateInstruction();
+            };
+            return translations[instruction] || instruction;
+        }
+
+        function countStepTypes(steps) {
+            const typeCounts = {};
+            steps.forEach(step => {
+                const type = step.maneuver.type;
+                if (typeCounts[type]) {
+                    typeCounts[type]++;
+                } else {
+                    typeCounts[type] = 1;
                 }
             });
 
-            document.getElementById("nextButton").addEventListener("click", function () {
-                if (currentStepIndex < stepsPath.length - 1) {
-                    currentStepIndex++;
-                    updateInstruction();
-                }
-            });
+            /*console.log("各 type 的数量:");
+            for (const type in typeCounts) {
+                console.log(`${type}: ${typeCounts[type]}個`);
+            }*/
+        }
+
+        function updateInstruction() {
+            document.getElementById("card-distance").innerText = formatDistance(Math.floor(stepsPath[currentStepIndex].distance));
+            document.getElementById("card-instruction").innerText = translateInstruction(stepsPath[currentStepIndex].maneuver.modifier) + '進入' + stepsPath[currentStepIndex].name;
+        }
 
 
-        </script>
+
+    </script>
     </div>
 </body>
 
